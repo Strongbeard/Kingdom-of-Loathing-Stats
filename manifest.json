@@ -1,0 +1,38 @@
+{
+	"manifest_version": 2,
+	"name": "KoL Tool",
+	"version": "1.0",
+	
+	"description": "",
+	"icons": {
+		"16": "./img/favicon.png",
+		"19": "./img/favicon_19.png",
+		"38": "./img/favicon_38.png",
+		"128": "./img/favicon_128.png"
+	},
+	
+	"permissions": [
+		"http://www.kingdomofloathing.com/game.php",
+		"http://www.kingdomofloathing.com/api.php*",
+		"tabs",
+		"activeTab",
+		"declarativeContent",
+		"webRequest"
+	],
+	"page_action":
+	{
+		"default_icon": {
+			"16": "./img/favicon.png",
+			"19": "./img/favicon_19.png",
+			"38": "./img/favicon_38.png",
+			"128": "./img/favicon_128.png"
+
+		},
+		"default_title": "KoL Tool"
+	},
+	
+	"background": {
+		"scripts": ["jquery-1.10.2.min.js","background.js"],
+		"persistent": true
+	}
+}
