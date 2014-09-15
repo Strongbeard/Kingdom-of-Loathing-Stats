@@ -1,0 +1,65 @@
+body
+{
+	min-width: 357px;
+	overflow-x: hidden;
+}
+
+
+
+/* Font Color Spans */
+span.cold{ color:blue; }
+span.stench{ color:green; }
+span.hot{ color:red; }
+span.spooky{ color:grey; }
+span.sleaze{ color:blueviolet;}
+
+
+/* One + - Button*/
+/*.openCloseSelect a {
+background: url("btn_expand_collapse.png") no-repeat scroll -3px -3px transparent;
+display: block;
+float: left;
+font-size: 14px;
+font-weight: bold;
+height: 20px;
+padding-left: 18px;
+width: auto;
+text-decoration: none;
+}*/
+
+/*.openCloseSelect a.minusButton {
+background-position: -3px -23px;
+}*/
+
+/*.openCloseSelect a {
+background: url("btn_expand_collapse.png") no-repeat scroll -3px -3px transparent;
+display: block;
+font-size: 14px;
+font-weight: bold;
+height: 20px;
+padding-left: 18px;
+width: auto;
+text-decoration: none;
+}*/
+
+div.dropdownPlusMinus ul {
+display: none;
+}
+
+div.dropdownPlusMinus a {
+display: block;
+font-size: 14px;
+font-weight: bold;
+height: 20px;
+padding-left: 18px;
+width: auto;
+text-decoration: none;
+}
+
+a.minusButton {
+background: url("./img/minus_expand_collapse.png") no-repeat scroll -3px -3px transparent;
+}
+
+a.plusButton {
+background: url("./img/plus_expand_collapse.png") no-repeat scroll -3px -3px transparent;
+}
