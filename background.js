@@ -13,21 +13,13 @@ var pageActionRule = {
 };
 
 
-//------------------------ GLOBAL VARIABLES & CLASSES --------------------------
-
-
-// CLASSES
-/*function ITEM() {
-	this.index = "";
-	this.enchantments = []
-}
-
-function ITEM_LIST() {
-	
-}*/
+//------------------------ GLOBAL VARIABLES --------------------------
 
 
 // GLOBAL VARIABLES
+
+// Stats object tracks all user's accumulated stats from equipment and
+// enchantments.
 var stats = JSON.parse(localStorage.getItem("stats"));
 if( stats === null ) {
 	var stats = {
@@ -227,7 +219,7 @@ console.log(skillID);
 			{
 				skill_effects[newSkill] = { passive: false, enchantments: [] };
 				$.get( "http://www.kingdomofloathing.com/desc_skill.php?whichskill=" + newSkill + "&self=true", function( data ) {
-					enchantments = decipherIngameDesc( data );
+					enchantments = scrapeHTMLforStats( data, "skill" );
 					skill_effects[newSkill].enchantments = enchantments;
 					if( data.match(/passive/i) )
 					{
@@ -244,17 +236,21 @@ console.log(skill_effects);
 		// --- OUTFIT ---
 		
 console.log("OUTFIT");
-		// Checks if character is wearing an outfit
+		// If character is wearing an outfit, get it's enchantments
 		if( charsheet_html.search("Outfit:") != -1 ) {
+			// Gets the outfit id number
 			outfit_num = charsheet_html.substring(charsheet_html.search("Outfit:"));
 			outfit_num = outfit_num.substring(outfit_num.search("whichoutfit=")+12);
 			outfit_num = outfit_num.substring(0,outfit_num.search("\""));
+			
+			// AJAX query to get the outfit html description
 			$.ajax({
 				url: "http://www.kingdomofloathing.com/desc_outfit.php?whichoutfit=" + outfit_num,
-				async: false
+				async: false,
+				dataType: "html"
 			})
-			.done(function(outfit_html, status, xhr) {
-				console.log(outfit_html);
+			.done(function(outfit_html_string, status, xhr) {
+				console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
 			});
 		}
 	}, 'html');
@@ -452,7 +448,7 @@ console.log("EQUIPNUM: " + equipNum);
 					url:	"http://www.kingdomofloathing.com/desc_item.php?whichitem=" + result.descid,
 					async:	false,
 					success: function(result) {
-						array =  decipherIngameDesc(result);
+						array = scrapeHTMLforStats(result, "equipment");
 					}
 				});
 			}
@@ -466,56 +462,14 @@ console.log("EQUIPNUM: " + equipNum);
 }
 
 
-// 
-function decipherIngameDesc(data) {
-	// Enchantment data will come after the html blockquote tag
-	if( data.match(/<blockquote[^>]*>/i) )
-	{
-		var ench_data = data.slice(data.indexOf("<blockquote"));
-		
-		// Enchantment data will come after the html center tag
-		if( ench_data.match("<center>") )
-		{
-			ench_data = ench_data.slice(ench_data.indexOf("<center>")+8,ench_data.indexOf("</center>"));
-
-			// Enchantment data will be within the html font color=blue tag
-			if( ench_data.match("<font color=blue"))
-			{
-				ench_data = ench_data.slice(ench_data.indexOf("<font color=blue"),ench_data.lastIndexOf("</font>"));
-				ench_data = ench_data.slice(ench_data.indexOf(">")+1);
-				/*if( ench_data.match( "<b>" ) )
-				{
-					ench_data = ench_data.slice(ench_data.indexOf("<b>")+3,ench_data.lastIndexOf("</b>"));
-				}*/
-
-				// split data on <br> tag to array. Remove all other html tags from data.
-				var ench_list = ench_data.split( "<br>" );
-				for( var i = 0; i < ench_list.length; i++) {
-					ench_list[i] = ench_list[i].replace(/<[^>]*>/g,"");
-				}
-				
-				// Removes empty parts of arrays & returns array
-				ench_list = ench_list.filter(function(n){return n});
-				return ench_list;
-/*				for(var i = 0; i < ench_list.length; i++)
-				{
-					if( ench_list[i] != "" )
-					{
-						addEnchantment( ench_list[i].toLowerCase() );
-					}
-				}*/
-			}
-		}
-	}
-	// Return empty array if could not find enchantments
-	return new Array();
-}
 
 function getEffectDesc(effect_id) {
 	var array;
 	$.ajax({
 		url: "http://www.kingdomofloathing.com/desc_effect.php?whicheffect=" + effect_id,
-		success: function(result) { array = decipherIngameDesc(result); },
+		success: function(result) {
+			array = scrapeHTMLforStats(result, "effect");
+		},
 		async:false
 	});
 	return array;
@@ -580,18 +534,48 @@ function getModifier( enchantment, addOrRemoveFlag )
 }
 
 
-
-
-
-// 
-
-// Show's this extention's page_action icon if url is
-// http://www.kingdomofloathing.com/game.php
-/*chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	if (tab.url === "http://www.kingdomofloathing.com/game.php"){
-		chrome.pageAction.show(tabId);
+/* Takes a string containing html containing enchantment information and what
+ * type of enchantments to look for. Returns an array of the enchantment
+ * strings. */
+function scrapeHTMLforStats(html_string, type) {
+	// Empty array to hold enchantments
+	var enchantments = new Array();
+	
+	// Parse the html string into a DOM document
+	var parser = new DOMParser();
+	var doc = parser.parseFromString(html_string,"text/html");
+	
+	// The HTML DOM will be structured differently if the html is describing
+	// equipment, skills, or outfits. Switch statement to handle each case.
+	switch( type ) {
+		case "outfit":
+			enchantments = $( "b>font", doc )[0].innerText.split(/\n+/);
+			break;
+		case "equipment":
+			enchantments = $("blockquote>center>b>font", doc)[0].innerText.split(/\n+/);
+			break;
+		case "skill":
+			console.log("SKILL - SCRAPE" );
+			var selector = $("#description>blockquote>font>center>font>b", doc );
+			if( selector.length > 0 ) {
+				enchantments = selector[0].innerText.split(/\n+/);
+			}
+			break;
+		case "effect":
+			console.log("EFFECT - SCRAPE");
+			enchantments = $("#description>font>center>font>b", doc)[0].innerText.split(/\n+/);
 	}
-});*/
+	
+	// Remove last element in array if it is empty
+	if( enchantments[enchantments.length-1] == "" ) {
+		enchantments.pop();
+	}
+	
+console.log( enchantments );
+	return enchantments;
+}
+
+
 
 
 //----------------------------------EVENTS-------------------------------------
@@ -620,22 +604,3 @@ chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
 		chrome.runtime.sendMessage("PRINT");
 	}
 });
-
-/*chrome.webRequest.onCompleted.addListener(function(request) {
-	console.log(request);
-	if( request.url == "http://www.kingdomofloathing.com/charpane.php") {
-		readAPICharacterSheet();
-		chrome.runtime.sendMessage("PRINT");
-	}
-	
-},{urls:["http://www.kingdomofloathing.com/*\.php"], types: ["sub_frame"]},[]);
-*/
-
-/*chrome.runtime.onStartup.addListener(function() {
-});*/
-
-//chrome.webNavigation.onCompleted.addListener(function(request){
-//	if( request.url.match(/http:\/\/www.kingdomofloathing.com\/*/i)) {
-//		console.log(request.url);
-//	}
-//});

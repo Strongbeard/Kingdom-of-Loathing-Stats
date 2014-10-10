@@ -85,7 +85,8 @@ function printStats() {
 	$("#hobo").html(  );
 }
 
-// 
+// Prints a stat only if one of it's values in non-zero.
+// NOT CURRENTLY USED!!!
 function printStat( htmlID, value, text, percent_flag, range_flag, span_class ) {
 console.log(htmlID);
 console.log(value);
