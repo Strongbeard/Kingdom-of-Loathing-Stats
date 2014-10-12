@@ -28,11 +28,11 @@ var outfit = {
 		return "{\"name\":\"" + this.name + "\",\"id\":" + this.id + ",\"enchantments\":" + JSON.stringify(this.enchantments) + "}";
 	},
 	writeToLocalStorage: function () {
-		localStorage.setItem( "outfit", {
+		localStorage.setItem( "outfit", JSON.stringify({
 			"name": this.name,
 			"id": this.id,
 			"enchantments": this.enchantments
-		});
+		}));
 	},
 	readFromLocalStorage: function () {
 		var storedOutfit = JSON.parse( localStorage.getItem("outfit") );

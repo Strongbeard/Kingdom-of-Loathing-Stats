@@ -244,7 +244,7 @@ console.log(skillID);
 			{
 				skill_effects[newSkill] = { passive: false, enchantments: [] };
 				$.get( "http://www.kingdomofloathing.com/desc_skill.php?whichskill=" + newSkill + "&self=true", function( data ) {
-					enchantments = scrapeHTMLforStats( data, "skill" );
+					enchantments = scrapeHTMLforStats( data, "skill" ).enchantments;
 					skill_effects[newSkill].enchantments = enchantments;
 					if( data.match(/passive/i) )
 					{
@@ -275,14 +275,16 @@ console.log("OUTFIT");
 				dataType: "html"
 			})
 			.done(function(outfit_html_string, status, xhr) {
-				console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
-				outfit.updateOutfit("bla",outfit_num,scrapeHTMLforStats(outfit_html_string, "outfit"));
+				//console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
+				var newOutfit = scrapeHTMLforStats(outfit_html_string, "outfit")
+				outfit.updateOutfit(newOutfit.name,outfit_num,newOutfit.enchantments);
 				console.log(outfit);
 			});
 		} // Remove previous outfit
 		else if( outfit != null || outfit.id != null ) {
 			outfit.removeOutfit();
 		}
+		outfit.writeToLocalStorage();
 	}, 'html');
 }
 
@@ -478,7 +480,7 @@ console.log("EQUIPNUM: " + equipNum);
 					url:	"http://www.kingdomofloathing.com/desc_item.php?whichitem=" + result.descid,
 					async:	false,
 					success: function(result) {
-						array = scrapeHTMLforStats(result, "equipment");
+						array = scrapeHTMLforStats(result, "equipment").enchantments;
 					}
 				});
 			}
@@ -498,7 +500,7 @@ function getEffectDesc(effect_id) {
 	$.ajax({
 		url: "http://www.kingdomofloathing.com/desc_effect.php?whicheffect=" + effect_id,
 		success: function(result) {
-			array = scrapeHTMLforStats(result, "effect");
+			array = scrapeHTMLforStats(result, "effect").enchantments;
 		},
 		async:false
 	});
@@ -565,11 +567,16 @@ function getModifier( enchantment, addOrRemoveFlag )
 
 
 /* Takes a string containing html containing enchantment information and what
- * type of enchantments to look for. Returns an array of the enchantment
- * strings. */
+ * type of enchantments to look for. Returns an object with the name of the 
+ * equipment, skill, or outfit and an array of its enchantments. Also returns
+ * whether a skill is passive or not.*/
 function scrapeHTMLforStats(html_string, type) {
 	// Empty array to hold enchantments
-	var enchantments = new Array();
+	var item = {
+		name: "",
+		enchantments: new Array()
+	}
+	item.enchantments = new Array();
 	
 	// Parse the html string into a DOM document
 	var parser = new DOMParser();
@@ -579,28 +586,38 @@ function scrapeHTMLforStats(html_string, type) {
 	// equipment, skills, or outfits. Switch statement to handle each case.
 	switch( type ) {
 		case "outfit":
-			enchantments = $( "b>font", doc )[0].innerText.split(/\n+/);
+			item.enchantments = $( "b>font", doc )[0].innerText.split(/\n+/);
+			item.name = $( "center>font>b", doc )[0].innerText;
 			break;
 		case "equipment":
-			enchantments = $("blockquote>center>b>font", doc)[0].innerText.split(/\n+/);
+			item.enchantments = $("blockquote>center>b>font", doc)[0].innerText.split(/\n+/);
+			item.name = $( "#description>center>b", doc )[0].innerText;
 			break;
 		case "skill":
 			console.log("SKILL - SCRAPE" );
 			var selector = $("#description>blockquote>font>center>font>b", doc );
 			if( selector.length > 0 ) {
-				enchantments = selector[0].innerText.split(/\n+/);
+				item.enchantments = selector[0].innerText.split(/\n+/);
+			}
+			item.name = $( "#description>center>font>b", doc )[0].innerText;
+			if( $( "#smallbits", doc )[0].innerText.match(/passive/i) ) {
+				item.passive = true;
+			}
+			else {
+				item.passive = false;
 			}
 			break;
 		case "effect":
 			console.log("EFFECT - SCRAPE");
-			enchantments = $("#description>font>center>font>b", doc)[0].innerText.split(/\n+/);
+			item.enchantments = $("#description>font>center>font>b", doc)[0].innerText.split(/\n+/);
+			item.name = $( "#description>font>center>p>b", doc )[0].innerText;
 	}
 	
 	// Remove last element in array if it is empty
-	if( enchantments[enchantments.length-1] == "" ) {
-		enchantments.pop();
+	if( item.enchantments[item.enchantments.length-1] == "" ) {
+		item.enchantments.pop();
 	}
 	
-console.log( enchantments );
-	return enchantments;
+console.log( item );
+	return item;
 }
