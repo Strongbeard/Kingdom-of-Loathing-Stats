@@ -13,8 +13,37 @@ var pageActionRule = {
 };
 
 
-//------------------------ GLOBAL VARIABLES --------------------------
 
+//----------------------------------EVENTS-------------------------------------
+
+// Adds page action rule on install
+chrome.runtime.onInstalled.addListener(function() {
+	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+		chrome.declarativeContent.onPageChanged.addRules([pageActionRule]);
+	});
+});
+
+// Makes clicking on page action button open a popup window
+chrome.pageAction.onClicked.addListener( function() {
+	chrome.windows.create({
+		"url": "popup.html",
+		"type": "popup",
+		"width": 450,
+		"height": 500
+	});
+});
+
+chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
+	if( changeInfo.status !== undefined && changeInfo.status == "complete" && tab.url == "http://www.kingdomofloathing.com/game.php" ) {
+		readAPICharacterSheet();
+		readHTMLCharacterSheet();
+		chrome.runtime.sendMessage("PRINT");
+	}
+});
+
+
+
+//------------------------ GLOBAL VARIABLES --------------------------
 
 // GLOBAL VARIABLES
 
@@ -90,11 +119,7 @@ if( passive_effects === null )
 	passive_effects = new Object();
 }
 
-var outfit = JSON.parse(localStorage.getItem("outfit"));
-if( outfit === null )
-{
-	outfit = new Object();
-}
+outfit.readFromLocalStorage();
 
 
 //---------------------------------FUNCTIONS-----------------------------------
@@ -251,7 +276,12 @@ console.log("OUTFIT");
 			})
 			.done(function(outfit_html_string, status, xhr) {
 				console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
+				outfit.updateOutfit("bla",outfit_num,scrapeHTMLforStats(outfit_html_string, "outfit"));
+				console.log(outfit);
 			});
+		} // Remove previous outfit
+		else if( outfit != null || outfit.id != null ) {
+			outfit.removeOutfit();
 		}
 	}, 'html');
 }
@@ -574,33 +604,3 @@ function scrapeHTMLforStats(html_string, type) {
 console.log( enchantments );
 	return enchantments;
 }
-
-
-
-
-//----------------------------------EVENTS-------------------------------------
-
-// Adds page action rule on install
-chrome.runtime.onInstalled.addListener(function() {
-	chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-		chrome.declarativeContent.onPageChanged.addRules([pageActionRule]);
-	});
-});
-
-// Makes clicking on page action button open a popup window
-chrome.pageAction.onClicked.addListener( function() {
-	chrome.windows.create({
-		"url": "popup.html",
-		"type": "popup",
-		"width": 450,
-		"height": 500
-	});
-});
-
-chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
-	if( changeInfo.status !== undefined && changeInfo.status == "complete" && tab.url == "http://www.kingdomofloathing.com/game.php" ) {
-		readAPICharacterSheet();
-		readHTMLCharacterSheet();
-		chrome.runtime.sendMessage("PRINT");
-	}
-});
