@@ -261,25 +261,28 @@ console.log(skill_effects);
 		// --- OUTFIT ---
 		
 console.log("OUTFIT");
-		// If character is wearing an outfit, get it's enchantments
+		// If character is wearing a new outfit, get it's enchantments
 		if( charsheet_html.search("Outfit:") != -1 ) {
 			// Gets the outfit id number
 			outfit_num = charsheet_html.substring(charsheet_html.search("Outfit:"));
 			outfit_num = outfit_num.substring(outfit_num.search("whichoutfit=")+12);
 			outfit_num = outfit_num.substring(0,outfit_num.search("\""));
 			
-			// AJAX query to get the outfit html description
-			$.ajax({
-				url: "http://www.kingdomofloathing.com/desc_outfit.php?whichoutfit=" + outfit_num,
-				async: false,
-				dataType: "html"
-			})
-			.done(function(outfit_html_string, status, xhr) {
-				//console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
-				var newOutfit = scrapeHTMLforStats(outfit_html_string, "outfit")
-				outfit.updateOutfit(newOutfit.name,outfit_num,newOutfit.enchantments);
-				console.log(outfit);
-			});
+			// If the outfit has changed, update the outfit
+			if( outfit.id != outfit_num ) {
+				// AJAX query to get the outfit html description
+				$.ajax({
+					url: "http://www.kingdomofloathing.com/desc_outfit.php?whichoutfit=" + outfit_num,
+					async: false,
+					dataType: "html"
+				})
+				.done(function(outfit_html_string, status, xhr) {
+					//console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
+					var newOutfit = scrapeHTMLforStats(outfit_html_string, "outfit")
+					outfit.updateOutfit(newOutfit.name,outfit_num,newOutfit.enchantments);
+					console.log(outfit);
+				});
+			}
 		} // Remove previous outfit
 		else if( outfit != null || outfit.id != null ) {
 			outfit.removeOutfit();

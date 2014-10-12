@@ -40,9 +40,7 @@ var outfit = {
 			storedOutfit = JSON.parse( storedOutfit );
 		}
 		if( storedOutfit ) {
-			this.name = storedOutfit.name;
-			this.id = storedOutfit.id;
-			this.enchantments = storedOutfit.enchantments;
+			this.addOutfit( storedOutfit.name, storedOutfit.id, storedOutfit.enchantments );
 		}
 	}
 }
