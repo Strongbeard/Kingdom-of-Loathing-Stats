@@ -35,7 +35,10 @@ var outfit = {
 		}));
 	},
 	readFromLocalStorage: function () {
-		var storedOutfit = JSON.parse( localStorage.getItem("outfit") );
+		var storedOutfit = localStorage.getItem("outfit");
+		if( storedOutfit ) {
+			storedOutfit = JSON.parse( storedOutfit );
+		}
 		if( storedOutfit ) {
 			this.name = storedOutfit.name;
 			this.id = storedOutfit.id;
