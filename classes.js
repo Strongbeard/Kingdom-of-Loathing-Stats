@@ -1,4 +1,21 @@
+//----------------------------------EQUIPMENT-----------------------------------
 
+function Equipment (name, id, enchantments) {
+	this.name = typeof name !== 'undefined' ? name : "";
+	this.id = typeof id !== 'undefined' ? id : null;
+	this.enchantments = typeof enchantments !== 'undefined ? enchantments : [];
+	$.each( this.enchantments, function( index, ench ) {
+		updateEnchantment(ench, true);
+	});
+}
+
+Equipment.prototype.removeEnchantments = function () {
+	$.each( this.enchantments, function( index, ench ) {
+		updateEnchantment(ench, false);
+	}
+}
+
+//------------------------------------OUTFIT------------------------------------
 
 var outfit = {
 	name: "",
