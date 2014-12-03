@@ -202,7 +202,16 @@ console.log(enchantment);
 // Takes HTML from http://www.kingdomofloathing.com/charsheet.php and extracts information about it's skills
 // Passive skill effects get added
 function readHTMLCharacterSheet() {
-	$.get( "http://www.kingdomofloathing.com/charsheet.php", function( charsheet_html, status, xhr ) {
+//	$.get( "http://www.kingdomofloathing.com/charsheet.php", function( charsheet_html, status, xhr ) {
+console.log( "--- CHAR SHEET ---" );
+	$.ajax({
+		async: false,
+		dataType: "html",
+		type: "GET",
+		url: "http://www.kingdomofloathing.com/charsheet.php"
+	}).done( function( charsheet_html, status, xhr ) {
+	console.log( charsheet_html );
+	console.log( status );
 console.log("PASSIVE EFFECTS:");
 
 		// --- PASSIVE EFFECTS ---
@@ -288,7 +297,11 @@ console.log("OUTFIT");
 			outfit.removeOutfit();
 		}
 		outfit.writeToLocalStorage();
-	}, 'html');
+//	}, 'html');
+	}).fail( function(jqXHR, textStatus, errorThrown) {
+		console.error(errorThrown);
+	});
+	console.log( "--- END CHAR SHEET ---" );
 }
 
 
@@ -598,16 +611,23 @@ function scrapeHTMLforStats(html_string, type) {
 			break;
 		case "skill":
 			console.log("SKILL - SCRAPE" );
+			// Select enchantment using 
 			var selector = $("#description>blockquote>font>center>font>b", doc );
 			if( selector.length > 0 ) {
 				item.enchantments = selector[0].innerText.split(/\n+/);
+				item.name = $( "#description>center>font>b", doc )[0].innerText;
+				if( $( "#smallbits", doc )[0].innerText.match(/passive/i) ) {
+					item.passive = true;
+				}
+				else {
+					item.passive = false;
+				}
 			}
-			item.name = $( "#description>center>font>b", doc )[0].innerText;
-			if( $( "#smallbits", doc )[0].innerText.match(/passive/i) ) {
-				item.passive = true;
+			else if( $("#description", doc )[0].innerText === "No skill found." ) {
+				console.warn("scrapeHTMLforStats(string html_string, string type) => Skill request returned \"No skill found.\"");
 			}
 			else {
-				item.passive = false;
+				console.warn("scrapeHTMLforStats(string html_string, string type) => Skill scrape couldn't find enchantment.");
 			}
 			break;
 		case "effect":
