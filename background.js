@@ -254,13 +254,15 @@ console.log(skillID);
 				skill_effects[newSkill] = { passive: false, enchantments: [] };
 				$.get( "http://www.kingdomofloathing.com/desc_skill.php?whichskill=" + newSkill + "&self=true", function( data ) {
 					enchantments = scrapeHTMLforStats( data, "skill" ).enchantments;
-					skill_effects[newSkill].enchantments = enchantments;
-					if( data.match(/passive/i) )
-					{
-						skill_effects[newSkill].passive = true;
-						$.each( skill_effects[newSkill].enchantments, function(index, enchantment) {
-							updateEnchantment( enchantment, true );
-						});
+					if( enchantments !== null ) {
+						skill_effects[newSkill].enchantments = enchantments;
+						if( data.match(/passive/i) )
+						{
+							skill_effects[newSkill].passive = true;
+							$.each( skill_effects[newSkill].enchantments, function(index, enchantment) {
+								updateEnchantment( enchantment, true );
+							});
+						}
 					}
 				}, 'html');
 			}
@@ -288,8 +290,10 @@ console.log("OUTFIT");
 				.done(function(outfit_html_string, status, xhr) {
 					//console.log( scrapeHTMLforStats(outfit_html_string, "outfit"));
 					var newOutfit = scrapeHTMLforStats(outfit_html_string, "outfit")
-					outfit.updateOutfit(newOutfit.name,outfit_num,newOutfit.enchantments);
-					console.log(outfit);
+					if( newOutfit !== null ) {
+						outfit.updateOutfit(newOutfit.name,outfit_num,newOutfit.enchantments);
+						console.log(outfit);
+					}
 				});
 			}
 		} // Remove previous outfit
@@ -625,9 +629,11 @@ function scrapeHTMLforStats(html_string, type) {
 			}
 			else if( $("#description", doc )[0].innerText === "No skill found." ) {
 				console.warn("scrapeHTMLforStats(string html_string, string type) => Skill request returned \"No skill found.\"");
+				item = null;
 			}
 			else {
 				console.warn("scrapeHTMLforStats(string html_string, string type) => Skill scrape couldn't find enchantment.");
+				item = null;
 			}
 			break;
 		case "effect":
@@ -637,7 +643,7 @@ function scrapeHTMLforStats(html_string, type) {
 	}
 	
 	// Remove last element in array if it is empty
-	if( item.enchantments[item.enchantments.length-1] == "" ) {
+	if( item !== null && item.enchantments[item.enchantments.length-1] == "" ) {
 		item.enchantments.pop();
 	}
 	
