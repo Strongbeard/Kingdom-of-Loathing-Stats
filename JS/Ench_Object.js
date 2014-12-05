@@ -1,9 +1,13 @@
-//----------------------------------ENCH_OBJECT-----------------------------------
+//################################ ENCH_OBJECT #################################
+
+// --- CONSTRUCTORS ---
 function Ench_Object( name, id, enchantments ) {
+	// Set variables
 	this.name = name;
 	this.id = id;
 	this.enchantments = (typeof enchantments !== 'undefined') ? enchantments : [];
 	
+	// Error Checking
 	if(typeof(this.name) !== "string") {
 		throw new TypeError(this.constructor.name + " => name should be a string. " + this.constructor.name + " = " + this);
 	}
@@ -17,7 +21,11 @@ function Ench_Object( name, id, enchantments ) {
 	}
 }
 
-Ench_Object.prototype.addEnchantment( enchantment ) {
+// --- MODIFIERS ---
+
+// Adds an enchantment to the list and sets the enchantment's ench_obj pointer
+// to this Ench_Object
+Ench_Object.prototype.addEnchantment = function( enchantment ) {
 	if( enchantment.constructor !== Enchantment ) {
 		throw new TypeError( "Equipment::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
 	}
@@ -26,11 +34,14 @@ Ench_Object.prototype.addEnchantment( enchantment ) {
 	this.enchantments.push(enchantment);
 }
 
+// --- ACCESSORS ---
+
+// Print JSON representation of object.
 Ench_Object.prototype.toString = function() {
 	return JSON.stringify(this);
 }
 
-//----------------------------------EQUIPMENT-----------------------------------
+//################################# EQUIPMENT ##################################
 
 // --- CONSTRUCTORS ---
 
@@ -42,16 +53,11 @@ Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
 
-// --- MODIFIERS ---
 
-/*Equipment.prototype.addEnchantment( enchantment ) {
-	if( enchantment.constructor !== Enchantment ) {
-		throw new TypeError( "Equipment::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
-	}
-	
-	enchantment.ench_obj = this;
-	this.enchantments.push(enchantment);
-}*/
+
+
+
+
 
 /*//----------------------------------EQUIPMENT-----------------------------------
 
