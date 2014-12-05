@@ -1,22 +1,57 @@
 //----------------------------------ENCH_OBJECT-----------------------------------
 function Ench_Object( name, id, enchantments ) {
-	this.name = (typeof name !== 'undefined') ? name : "";
-	this.id = (typeof id !== 'undefined') ? id : null;
+	this.name = name;
+	this.id = id;
 	this.enchantments = (typeof enchantments !== 'undefined') ? enchantments : [];
+	
+	if(typeof(this.name) !== "string") {
+		throw new TypeError(this.constructor.name + " => name should be a string. " + this.constructor.name + " = " + this);
+	}
+	
+	if(typeof(this.id) !== "number") {
+		throw new TypeError(this.constructor.name + " => id should be a number. " + this.constructor.name + " = " + this);
+	}
+	
+	if( ! (this.enchantments.constructor === Array) ) {
+		throw new TypeError(this.constructor.name + " => enchantments should be an array. " + this.constructor.name + " = " + this);
+	}
+}
+
+Ench_Object.prototype.addEnchantment( enchantment ) {
+	if( enchantment.constructor !== Enchantment ) {
+		throw new TypeError( "Equipment::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
+	}
+	
+	enchantment.ench_obj = this;
+	this.enchantments.push(enchantment);
+}
+
+Ench_Object.prototype.toString = function() {
+	return JSON.stringify(this);
 }
 
 //----------------------------------EQUIPMENT-----------------------------------
 
-//Equipment.prototype.parent = Ench_Object.prototype;
+// --- CONSTRUCTORS ---
+
 function Equipment( name, id, enchantments ) {
-/*	this.name = name;
-	this.id = id;
-	this.enchantments = enchantments;*/
-	Ench_Object.apply(this, arguments);
+	this.type = "Equipment";
+	Ench_Object.call(this, name, id, enchantments);
 }
-Equipment.prototype = Object.create(Ench_Object.prototype)
+Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
+
+// --- MODIFIERS ---
+
+/*Equipment.prototype.addEnchantment( enchantment ) {
+	if( enchantment.constructor !== Enchantment ) {
+		throw new TypeError( "Equipment::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
+	}
+	
+	enchantment.ench_obj = this;
+	this.enchantments.push(enchantment);
+}*/
 
 /*//----------------------------------EQUIPMENT-----------------------------------
 
