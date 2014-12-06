@@ -1,7 +1,3 @@
-//---------------------------------- GLOBAL VARIABLES -------------------------------------
-//var APICharacterSheetFlag = false;
-//var HTMLCharacterSheetFlag = false;
-
 //---------------------------------- RULES -------------------------------------
 
 // Specifies that page action icon only appears on KoL game page
