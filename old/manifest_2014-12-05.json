@@ -30,8 +30,9 @@
 		},
 		"default_title": "KoL Tool"
 	},
+	
 	"background": {
-		"scripts": ["JS/jquery-2.1.1.min.js","JS/Ench_Object.js","JS/Enchantment.js","JS/Stats.js","JS/background.js"],
+		"scripts": ["jquery-2.1.1.min.js","classes.js","background.js"],
 		"persistent": true
 	}
 }

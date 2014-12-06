@@ -6,6 +6,7 @@ function Ench_Object( name, id, enchantments ) {
 	this.name = name;
 	this.id = id;
 	this.enchantments = (typeof enchantments !== 'undefined') ? enchantments : [];
+	this.type = "Ench_Object";
 	
 	// Error Checking
 	if(typeof(this.name) !== "string") {
@@ -27,98 +28,116 @@ function Ench_Object( name, id, enchantments ) {
 // to this Ench_Object
 Ench_Object.prototype.addEnchantment = function( enchantment ) {
 	if( enchantment.constructor !== Enchantment ) {
-		throw new TypeError( "Equipment::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
+		throw new TypeError( this.constructor + "::addEnchantment() => enchantment should be a string. enchantment = " + enchantment);
 	}
 	
 	enchantment.ench_obj = this;
 	this.enchantments.push(enchantment);
+	enchantment.stat.addEnchantment(enchantment);
 }
 
 // --- ACCESSORS ---
 
-// Print JSON representation of object.
+// Print psudo-JSON representation of object.
 Ench_Object.prototype.toString = function() {
-	return JSON.stringify(this);
+	return "{\"name\":\"" + this.name +
+	       "\",\"id\":" + this.id + 
+	       ",\"type\":\"" + this.type + 
+	       "\",\"enchantments\":[]}";
 }
+
 
 //################################# EQUIPMENT ##################################
 
 // --- CONSTRUCTORS ---
 
 function Equipment( name, id, enchantments ) {
-	this.type = "Equipment";
 	Ench_Object.call(this, name, id, enchantments);
+	this.type = "Equipment";
+	
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
+}
+Equipment.prototype = Object.create(Ench_Object.prototype);
+Equipment.prototype.constructor = Equipment;
+
+//Equipment.prototype.
+
+
+//################################# SKILL ##################################
+
+// --- CONSTRUCTORS ---
+
+function Skill( name, id, enchantments ) {
+	Ench_Object.call(this, name, id, enchantments);
+	this.type = "Skill";
+	
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
 }
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
 
+//################################# BUFF ##################################
 
+// --- CONSTRUCTORS ---
 
-
-
-
-
-/*//----------------------------------EQUIPMENT-----------------------------------
-
-function Equipment (name, id, enchantments) {
-	this.name = (typeof name !== 'undefined') ? name : "";
-	this.id = (typeof id !== 'undefined') ? id : null;
-	this.enchantments = (typeof enchantments !== 'undefined') ? enchantments : [];
-	$.each( this.enchantments, function( index, ench ) {
-		updateEnchantment(ench, true);
-	});
+function Buff( name, id, enchantments ) {
+	Ench_Object.call(this, name, id, enchantments);
+	this.type = "Buff";
+	
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
 }
+Equipment.prototype = Object.create(Ench_Object.prototype);
+Equipment.prototype.constructor = Equipment;
 
-Equipment.prototype.removeEnchantments = function () {
-	$.each( this.enchantments, function( index, ench ) {
-		updateEnchantment(ench, false);
-	});
+
+//################################# OUTFIT ##################################
+
+// --- CONSTRUCTORS ---
+
+function Outfit( name, id, enchantments ) {
+	Ench_Object.call(this, name, id, enchantments);
+	this.type = "Outfit";
+	
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
 }
+Equipment.prototype = Object.create(Ench_Object.prototype);
+Equipment.prototype.constructor = Equipment;
 
-//------------------------------------OUTFIT------------------------------------
 
-var outfit = {
-	name: "",
-	id: null,
-	enchantments: [],
-	removeOutfit: function () {
-		this.name = "";
-		this.id = null;
-		$.each(this.enchantments, function(index, ench) {
-			updateEnchantment(ench, false);
-		});
-		this.enchantments = [];
-	},
-	addOutfit: function(name, id, enchantments) {
-		this.name = name;
-		this.id = id;
-		this.enchantments = enchantments;
-		$.each( this.enchantments, function( index, ench) {
-			updateEnchantment(ench, true);
-		});
-	},
-	updateOutfit: function (name, id, enchantments) {
-		this.removeOutfit();
-		this.addOutfit( name, id, enchantments );
-	},
-	toString: function () {
-		return "{\"name\":\"" + this.name + "\",\"id\":" + this.id + ",\"enchantments\":" + JSON.stringify(this.enchantments) + "}";
-	},
-	writeToLocalStorage: function () {
-		localStorage.setItem( "outfit", JSON.stringify({
-			"name": this.name,
-			"id": this.id,
-			"enchantments": this.enchantments
-		}));
-	},
-	readFromLocalStorage: function () {
-		var storedOutfit = localStorage.getItem("outfit");
-		if( storedOutfit ) {
-			storedOutfit = JSON.parse( storedOutfit );
+//################################# SIGN ##################################
+
+// --- CONSTRUCTORS ---
+
+function Sign( name, id, enchantments ) {
+	Ench_Object.call(this, name, id, enchantments);
+	this.type = "Sign";
+	
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
+}
+Equipment.prototype = Object.create(Ench_Object.prototype);
+Equipment.prototype.constructor = Equipment;
+
+
+//################################# ENCH_OBJECTS ##################################
+
+// Enchanted objects global storage object.
+Ench_Objects = {
+	equipment: {},
+	skills: {},
+	buffs: {},
+	outfit: null,
+	sign: null,
+	addObject : function( ench_obj ) {
+		if( ! this instanceof Ench_Object) {
+			throw new TypeError("Ench_Objects => ench_obj must inherit from the Ench_Object class.");
 		}
-		if( storedOutfit ) {
-			this.addOutfit( storedOutfit.name, storedOutfit.id, storedOutfit.enchantments );
-		}
+
+		this[ench_obj.type.toLowerCase()][ench_obj.id] = ench_obj;
 	}
-}*/
+}

@@ -1,14 +1,14 @@
-function Enchantment( stat, value, ench_obj, percent, range, maxValue ) {
+function Enchantment( stat, value, percent, range, maxValue, ench_obj ) {
 	this.stat = stat;	// Stat Added to the enchantment
 	this.value = value;	// Value of enchantment (or min range value)
 	this.percent = (typeof(percent) !== "undefined") ? percent : false;	// Value(s) are percentages if true.
-	this.range = (typeof(range) !== "undefined") ? percent : false;	// Enchantment is a range.
+	this.range = (typeof(range) !== "undefined") ? range : false;	// Enchantment is a range.
 	this.maxValue = (typeof(maxValue) !== "undefined") ? maxValue : null;
 	this.minValue = (range) ? value : null;
 	this.ench_obj = (typeof(ench_obj) !== "undefined") ? ench_obj : null;	// Pointer to parent enchantment object
 	
-	if( typeof(this.stat) !== "string" ) {
-		throw new TypeError("Enchantment => stat should be a string. Enchantment = " + this);
+	if( stat.constructor !== Stat ) {
+		throw new TypeError("Enchantment => stat should be a Stat object. Enchantment = " + this);
 	}
 
 	if( typeof(this.value) !== "number" ) {
@@ -28,10 +28,17 @@ function Enchantment( stat, value, ench_obj, percent, range, maxValue ) {
 	}
 	
 	if( ench_obj instanceof Ench_Object && this.ench_obj !== null ) {
-		throw new TypeError("Enchantment => ench_obj should be an object. Enchantment = " + this);
+		throw new TypeError("Enchantment => ench_obj should be an Ench_Object object. Enchantment = " + this);
 	}
 }
 
 Enchantment.prototype.toString = function() {
-	return JSON.stringify(this);
+	return "{\"stat\":\"" + this.stat.name +
+	       "\",\"value\":" + this.value +
+	       ",\"percent\":" + this.percent +
+	       ",\"range\":" + this.range +
+		   ",\"minValue\":" + this.minValue + 
+		   ",\"maxValue\":" + this.maxValue + 
+		   ",\"ench_obj\":\"" + this.ench_obj.name +
+	       "\"}";
 }
