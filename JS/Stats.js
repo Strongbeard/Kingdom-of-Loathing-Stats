@@ -3,6 +3,7 @@
 function Stat( name, percent, range ) {
 	this.name = name;
 	this.value = 0;
+	this.percentValue = 0;
 	this.percent = (typeof(percent) !== "undefined") ? percent : false;;
 	this.range = (typeof(range) !== "undefined") ? range : false;;
 	this.minValue = 0;
@@ -38,22 +39,76 @@ Stat.prototype.addEnchantment = function( enchantment ) {
 		throw new TypeError("Stat => enchantment should be an Enchantment object. Enchantment = " + enchantment);
 	}
 	
-	// Add enchantment's value(s) to this stat's value(s)
-	if( this.range && enchantment.range) {
-		this.minValue += enchantment.minValue;
-		this.maxValue += enchantment.maxValue;
+	// Add enchantment's value(s) to stat's value(s)
+	if( enchantment.range ) {
+		if( this.range ) {
+			this.minValue += enchantment.minValue;
+			this.maxValue += enchantment.maxValue;
+		}
+		else {
+			throw new Error("Stat::addEnchantment() => Cannot add a range enchantment to a non-range stat. Stat = " + this + ", Enchantment = " + enchantment );
+		}
 	}
-	else if( !this.range && !enchantment.range ) {
-		this.value += enchantment.value;
+	else if( enchantment.percent ) {
+		if( this.percent ) {
+			this.percentValue += enchantment.value;
+		}
+		else {
+			throw new Error("Stat::addEnchantment() => Cannot add a percent enchantment to a non-percent stat. Stat = " + this + ", Enchantment = " + enchantment);
+		}
 	}
 	else {
-		// Throw error if Enchantment's & Stat's range booleans don't match
-		throw new Error("Stats::addEnchantment() => range boolean does not match between enchantment and stat. Stat = " + this + ", Enchantment = " + enchantment );
+		if( this.range ) {
+			throw new Error("Stat::addEnchantment() => Cannot add a non-range enchantment to a range stat. Stat = " + this + ", Enchantment = " + enchantment );
+		}
+		else {
+			this.value += enchantment.value;
+		}
 	}
 	
 	// Add enchantment to the appropriate associative array using it's
 	// ench_obj id as a key
-	this.ench_list[enchantment.ench_obj.type.toLowerCase()][enchantment.ench_obj.id] = (enchantment);
+	this.ench_list[enchantment.ench_obj.constructor.name.toLowerCase()][enchantment.ench_obj.id] = enchantment;
+}
+
+Stat.prototype.removeEnchantment = function( enchantment ) {
+	// Argument Type Error Checking
+	if( ! enchantment.constructor === Enchantment ) {
+		throw new TypeError("Stat::removeEnchantment() => enchantment should be an Enchantment object. Enchantment = " + enchantment);
+	}
+	
+	if( enchantment.stat.name !== this.name ) {
+		throw new TypeError("Stat::removeEnchantment() => enchantment stat doesn't match this stat. Stat = " + this + ", Enchantment = " + enchantment);
+	}
+	
+	// Remove enchantment's value(s) from this stat's value(s)
+	if( enchantment.range ) {
+		if( this.range ) {
+			this.minValue -= enchantment.minValue;
+			this.maxValue -= enchantment.maxValue;
+		}
+		else {
+			throw new Error("Stat::removeEnchantment() => Cannot remove a range enchantment from a non-range stat. Stat = " + this + ", Enchantment = " + enchantment );
+		}
+	}
+	else if( enchantment.percent ) {
+		if( this.percent ) {
+			this.percentValue -= enchantment.value;
+		}
+		else {
+			throw new Error("Stat::removeEnchantment() => Cannot remove a percent enchantment from a non-percent stat. Stat = " + this + ", Enchantment = " + enchantment);
+		}
+	}
+	else {
+		if( this.range ) {
+			throw new Error("Stat::removeEnchantment() => Cannot remove a non-range enchantment from a range stat. Stat = " + this + ", Enchantment = " + enchantment );
+		}
+		else {
+			this.value -= enchantment.value;
+		}
+	}
+	
+	delete this.ench_list[enchantment.ench_obj.constructor.name.toLowerCase()][enchantment.ench_obj.id];
 }
 
 // --- ACCESSORS ---
@@ -63,9 +118,10 @@ Stat.prototype.addEnchantment = function( enchantment ) {
  * Ench_Object.*/
 Stat.prototype.toString = function() {
 	return "{\"stat\":\"" + this.name +
-	       "\",\"value\":" + this.value +
 	       ",\"percent\":" + this.percent +
 	       ",\"range\":" + this.range +
+	       "\",\"value\":" + this.value +
+	       "\",\"percentValue\":" + this.percentValue +
 	       ",\"minValue\":" + this.minValue + 
 	       ",\"maxValue\":" + this.maxValue + 
 	       ",\"ench_list\":{}" +

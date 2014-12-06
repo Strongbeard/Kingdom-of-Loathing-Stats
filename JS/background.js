@@ -33,8 +33,10 @@ chrome.pageAction.onClicked.addListener( function() {
 	});
 });
 
+// Check for change in any Ench_Objects on KoL page reload/update
 chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
 	if( changeInfo.status !== undefined && changeInfo.status == "complete" && tab.url == "http://www.kingdomofloathing.com/game.php" ) {
+		// Flags represent completion of each Ench_Object set task
 		var finishedFlags = {
 			"Equipment" : false,
 			"Skills" : false,
@@ -42,6 +44,7 @@ chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
 			"Outfit" : false,
 			"Sign" : false
 		}
+		
 		APICharacterSheet(finishedFlags);
 		HTMLCharacterSheet(finishedFlags);
 	}
@@ -57,10 +60,43 @@ function APICharacterSheet(finishedFlags) {
 	}).done( function( charsheet_json, status, xhr ) {
 
 		console.log( charsheet_json);
-		// Loop through all charsheet equipment & get array of all ids
+		
+		// Build constant time lookup list for new equipment
+		new_equipment_ids = {};
+		$.each( charsheet_json.equipment, function( equip_slot, id ) {
+			if( id !== 0 ) {
+				new_equipment_ids[parseInt(id, 10)] = null;
+			}
+		});
+		console.log(new_equipment_ids);
+		
+		// Remove old Ench_Object
+		$.each( Ench_Objects.equipment, function( id, equip ) {
+			if( typeof(new_equipment_ids[id]) === "undefined" ) {
+				Ench_Objects.removeObject( "equipment", id );
+			}
+		});
+		
+		// Add new Ench_Object
+		new_equipment_flags = {};
+		$.each( new_equipment_ids, function ( id ) {
+			if( typeof( Ench_Objects.equipment[id] ) === "undefined" ) {
+				// Add new equipment to lookup queue
+				new_equipment_flags[id] = false;
+			}
+		});
+		
+		$.each( new_equipment_flag, function (id) {
+			equip = new Equipment(id);
+			equip.
+		});
 
 		// Set finished flags and try to run post ajax script
 		finishedFlags.Equipment = true;
+		
+		
+		
+		
 		finishedFlags.Buffs = true;
 		finishedFlags.Outfit = true;
 		finishedFlags.Sign = true;

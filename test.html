@@ -8,6 +8,11 @@
 	<script type="text/javascript" src="JS/Ench_Object.js"></script>
 	<script type="text/javascript" src="JS/Enchantment.js"></script>
 	<script type="text/javascript" src="JS/Stats.js"></script>
-	<script type="text/javascript" src="JS/background.js"></script>
+	<script type="text/javascript">
+	equip = new Equipment("ax", 1, [new Enchantment(Stats["mus"], 10)]);
+	Ench_Objects.removeObject("equipment",1);
+	console.log( Stats );
+	console.log( Ench_Objects );
+	</script>
 </body>
 </html>
