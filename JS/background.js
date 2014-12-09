@@ -77,22 +77,25 @@ function APICharacterSheet(finishedFlags) {
 			}
 		});
 		
-		// Add new Ench_Object
+		// Add new equipment to lookup queue
 		new_equipment_flags = {};
 		$.each( new_equipment_ids, function ( id ) {
 			if( typeof( Ench_Objects.equipment[id] ) === "undefined" ) {
-				// Add new equipment to lookup queue
 				new_equipment_flags[id] = false;
 			}
 		});
 		
-		$.each( new_equipment_flag, function (id) {
+		console.log( new_equipment_flags );
+		$.each( new_equipment_flags, function (id) {
+			if( typeof(id) === "string" ) {
+				id = parseInt(id,10);
+			}
 			equip = new Equipment(id);
-			equip.
+			equip.scrapeData( finishedFlags, new_equipment_flags );
 		});
 
 		// Set finished flags and try to run post ajax script
-		finishedFlags.Equipment = true;
+//		finishedFlags.Equipment = true;
 		
 		
 		
@@ -101,7 +104,7 @@ function APICharacterSheet(finishedFlags) {
 		finishedFlags.Outfit = true;
 		finishedFlags.Sign = true;
 		afterCharacterSheets(finishedFlags);
-	}).fail( function( jqHHR, textStatus, errorThrown ) {
+	}).fail( function( jqXHR, textStatus, errorThrown ) {
 		console.error(errorThrown);
 	});
 }
@@ -137,5 +140,6 @@ function afterCharacterSheets(finishedFlags) {
 	
 	if( allFinished ) {
 		console.log("DONE");
+		console.log( Ench_Objects );
 	}
 }

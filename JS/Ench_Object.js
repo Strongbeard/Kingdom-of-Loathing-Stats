@@ -4,7 +4,7 @@
 function Ench_Object( id, name, enchantments ) {
 	// Set variables
 	this.id = id;
-	this.name = (typeof name !== "undefined" name) ? name : "";
+	this.name = (typeof name !== "undefined") ? name : "";
 	enchantments = (typeof enchantments !== 'undefined') ? enchantments : [];
 	this.enchantments = new Array();
 	
@@ -30,7 +30,7 @@ function Ench_Object( id, name, enchantments ) {
 		this.enchantments.push(enchantment);
 		enchantment.stat.addEnchantment(enchantment);
 	}, this );
-}
+};
 
 // --- MODIFIERS ---
 
@@ -44,14 +44,14 @@ Ench_Object.prototype.addEnchantment = function( enchantment ) {
 	enchantment.ench_obj = this;
 	this.enchantments.push(enchantment);
 	enchantment.stat.addEnchantment(enchantment);
-}
+};
 
 Ench_Object.prototype.removeAllEnchantments = function() {
 	this.enchantments.forEach( function(enchantment, index, array) {
 		enchantment.stat.removeEnchantment(enchantment);
 	}, this );
 	this.enchantments = new Array();
-}
+};
 
 // --- ACCESSORS ---
 
@@ -61,7 +61,7 @@ Ench_Object.prototype.toString = function() {
 	       "\",\"id\":" + this.id + 
 	       ",\"type\":\"" + this.constructor.name + 
 	       "\",\"enchantments\":[]}";
-}
+};
 
 
 //################################# EQUIPMENT ##################################
@@ -69,26 +69,63 @@ Ench_Object.prototype.toString = function() {
 // --- CONSTRUCTORS ---
 
 function Equipment( id, name, enchantments ) {
+	// Call Parent Constructor Ench_Object
 	Ench_Object.call(this, id, name, enchantments);
+
+	this.scrapeData = function ( finishedFlags, new_equipment_flags ) {
+		var equip = this;
+		$.ajax({
+			async: true,
+			dataType: "json",
+			type: "GET",
+			url: "http://www.kingdomofloathing.com/api.php?what=item&for=Kol_Tool&id=" + equip.id
+		}).done( function( equipmentIdJSON, status, xhr ) {
+			$.ajax({
+				async: true,
+				dataType: "html",
+				type: "GET",
+				url: "http://www.kingdomofloathing.com/desc_item.php?whichitem=" + equipmentIdJSON.descid
+			}).done( function( equipment_html, status, xhr ) {
+				// --- Equipment ---
+				var doc = new DOMParser().parseFromString( equipment_html, "text/html");
+				console.log(doc);
+				equip.name = $( "#description>center>b", doc )[0].innerText;
+				enchantments = $("blockquote>center>b>font", doc)[0].innerText.split(/\n+/);
+				enchantments.forEach( function(enchantment_text, index, array) {
+					if( enchantment_text !== "" ) {
+						// ### RESUME WORKING HERE!!!###
+						console.log( enchantment_text );
+					}
+				}, equip);
+				
+				// --- All Finished Attempt ---
+				// Set this equipment id to finished (true)
+				new_equipment_flags[equip.id] = true;
+				
+				// Check if all new equipment is finished processing
+				setFinishedFlag = true;
+				$.each(new_equipment_flags, function(id, value) {
+					if( !value ) {
+						setFinishedFlag = false;
+					}
+				});
+				
+				// Attempt to call process to run after all AJAX finished
+				if( setFinishedFlag ) {
+					finishedFlags.Equipment = true;
+					afterCharacterSheets(finishedFlags);
+				}
+			}).fail( function( jqXHR, textStatus, errorThrown ) {
+				console.error(errorThrown);
+			});
+		}).fail( function( jqXHR, textStatus, errorThrown ) {
+			console.error(errorThrown);
+		});
+	};
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
-}
-Equipment.prototype = Object.create(Ench_Object.prototype);
-Equipment.prototype.constructor = Equipment;
-
-Equipment.prototype.scrapeData = function( new_equipment_flags, finishedFlags ) {
-	$.ajax({
-		asycn: true,
-		dataType: "html",
-		type: "GET",
-		url: "http://www.kingdomofloathing.com/api.php?what=item&for=Kol_Tool&id=" + this.id
-	}).done( function( charsheet_html, status, xhr ) {
-		// ### WORK ON THIS PART!!! ###
-	}).fail( function( jqHHR, textStatus, errorThrown ) {
-		console.error(errorThrown);
-	});
-}
+};
 
 
 //################################# SKILL ##################################
@@ -100,7 +137,7 @@ function Skill( id, name, enchantments ) {
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
-}
+};
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
@@ -114,7 +151,7 @@ function Buff( id, name, enchantments ) {
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
-}
+};
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
@@ -128,7 +165,7 @@ function Outfit( id, name, enchantments ) {
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
-}
+};
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
@@ -143,7 +180,7 @@ function Sign( id, name, enchantments ) {
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
-}
+};
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
 
@@ -182,4 +219,4 @@ Ench_Objects = {
 		// Remove the object from 
 		delete this[type][id];
 	}
-}
+};
