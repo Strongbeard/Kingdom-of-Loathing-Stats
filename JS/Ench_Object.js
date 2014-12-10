@@ -86,19 +86,37 @@ function Equipment( id, name, enchantments ) {
 				type: "GET",
 				url: "http://www.kingdomofloathing.com/desc_item.php?whichitem=" + equipmentIdJSON.descid
 			}).done( function( equipment_html, status, xhr ) {
-				// --- Equipment ---
+				// --- Equipment HTML Scrape ---
 				var doc = new DOMParser().parseFromString( equipment_html, "text/html");
 				console.log(doc);
-				equip.name = $( "#description>center>b", doc )[0].innerText;
-				enchantments = $("blockquote>center>b>font", doc)[0].innerText.split(/\n+/);
-				enchantments.forEach( function(enchantment_text, index, array) {
-					if( enchantment_text !== "" ) {
-						// ### RESUME WORKING HERE!!!###
-						console.log( enchantment_text );
+				try {
+					// Scrape equipment name & enchantment text from html
+					equip.name = $( "#description>center>b", doc )[0].innerText;
+					enchantments = $("blockquote>center>b>font", doc);
+					if( enchantments.length > 0 ) {
+						// Loop through all enchantment text lines
+						enchantments = enchantments[0].innerText.split(/\n+/);
+						enchantments.forEach( function(enchantment_text, index, array) {
+							if( enchantment_text !== "" ) {
+								// Create enchantment
+								ench = EnchantmentFromHtml(enchantment_text, equip);
+								if( ench !== null ) {
+									this.addEnchantment( ench );
+								}
+							}
+						}, equip);
 					}
-				}, equip);
+				}
+				catch( err ) {
+					if( err instanceof TypeError && err.message === "" ) {
+						console.error("Equipment id " + equip.id + " unable to read response equipment html");
+					}
+					else {
+						throw err;
+					}
+				}
 				
-				// --- All Finished Attempt ---
+				// --- All Finished Call Attempt ---
 				// Set this equipment id to finished (true)
 				new_equipment_flags[equip.id] = true;
 				
@@ -209,6 +227,9 @@ Ench_Objects = {
 			throw new TypeError("Ench_Objects::removeObject() => type must be one of the following strings: \"equipment\", \"skills\", \"buffs\", \"outfit\", or \"sign\"");
 		}
 		
+		if( typeof(id) === "string" ) {
+			id = parseInt(id,10);
+		}
 		if( typeof(id) !== "number" ) {
 			throw new TypeError("Ench_Objects::removeObject() => id must be a number.");
 		}

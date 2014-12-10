@@ -141,5 +141,6 @@ function afterCharacterSheets(finishedFlags) {
 	if( allFinished ) {
 		console.log("DONE");
 		console.log( Ench_Objects );
+		console.log( Stats );
 	}
 }
