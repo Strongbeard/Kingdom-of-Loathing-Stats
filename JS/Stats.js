@@ -135,6 +135,7 @@ Stat.prototype.toString = function() {
 Stats = {
 	"adventures" : new Stat("adventures"),
 	"boozeFind" : new Stat("boozeFind"),
+	"candyFind" : new Stat("candyFind"),
 	"coldResist" : new Stat("coldResist"),
 	"coldSpellDmg" : new Stat("coldSpellDmg", true),
 	"coldWpnDmg" : new Stat("coldWpnDmg", true),
