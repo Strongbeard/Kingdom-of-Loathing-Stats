@@ -65,7 +65,7 @@ function EnchantmentFromHtml( html_line, ench_obj ) {
 
 function getEnchNameFromHTML( html_line ) {
 	html_line = html_line.toLowerCase();
-	var name = html_line.match(/(damage|resistance|stat|combat initiative|monster level|item drops|meat|pickpocket|regenerate|adventure|muscle|mysticality|moxie|all attributes|maximum hp|maximum mp|familiar weight)/i);
+	var name = html_line.match(/(damage|resistance|stat|combat initiative|monster level|item drops|meat|pickpocket|regenerate|adventure|muscle|mysticality|moxie|all attributes|maximum hp|maximum mp|familiar weight)/);
 	if( name !== null ) {
 		switch(name[0]) {
 			case "adventure":
@@ -75,8 +75,8 @@ function getEnchNameFromHTML( html_line ) {
 			case "combat initiative":
 				return Stats.initiative;
 			case "damage":
-				if( enchantment.search(/spell/i) ) {
-					var spellType = html_line.match(/(cold|hot|spooky|sleaze|stench)/i);
+				if( html_line.indexOf("spell") ) {
+					var spellType = html_line.match(/(cold|hot|spooky|sleaze|stench)/);
 					if( spellType !== null ) {
 						switch(spellType[0]) {
 							case "cold":
@@ -99,7 +99,7 @@ function getEnchNameFromHTML( html_line ) {
 					}
 				}
 				else {
-					var damageType = html_line.match(/(absorption|cold|hot|ranged|reduction|spooky|sleaze|stench)/i);
+					var damageType = html_line.match(/(absorption|cold|hot|ranged|reduction|spooky|sleaze|stench)/);
 					if( damageType !== null ) {
 						switch(damageType[0]) {
 							case "absorption":
@@ -149,7 +149,7 @@ function getEnchNameFromHTML( html_line ) {
 			case "pickpocket":
 				return Stats.pickpocket;
 			case "regenerate":
-				var regenType = html_line.match(/(hp|mp)/i);
+				var regenType = html_line.match(/(hp|mp)/);
 				if( html_line !== null ) {
 					switch(regenType[0]) {
 						case "hp":
@@ -167,7 +167,7 @@ function getEnchNameFromHTML( html_line ) {
 				}
 				break;
 			case "resistance":
-				var resistType = html_line.match(/(cold|hot|spooky|sleaze|stench)/i);
+				var resistType = html_line.match(/(cold|hot|spooky|sleaze|stench)/);
 				if( resistType !== null ) {
 					switch(resistType[0]) {
 						case "cold":

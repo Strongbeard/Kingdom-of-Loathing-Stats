@@ -89,7 +89,7 @@ function Equipment( id, name, enchantments ) {
 				// --- Equipment HTML Scrape ---
 				var doc = new DOMParser().parseFromString( equipment_html, "text/html");
 				console.log(doc);
-				try {
+/*				try {*/
 					// Scrape equipment name & enchantment text from html
 					equip.name = $( "#description>center>b", doc )[0].innerText;
 					enchantments = $("blockquote>center>b>font", doc);
@@ -106,7 +106,7 @@ function Equipment( id, name, enchantments ) {
 							}
 						}, equip);
 					}
-				}
+/*				}
 				catch( err ) {
 					if( err instanceof TypeError && err.message === "" ) {
 						console.error("Equipment id " + equip.id + " unable to read response equipment html");
@@ -114,7 +114,7 @@ function Equipment( id, name, enchantments ) {
 					else {
 						throw err;
 					}
-				}
+				}*/
 				
 				// --- All Finished Call Attempt ---
 				// Set this equipment id to finished (true)
