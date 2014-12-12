@@ -36,6 +36,7 @@ chrome.pageAction.onClicked.addListener( function() {
 // Check for change in any Ench_Objects on KoL page reload/update
 chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
 	if( changeInfo.status !== undefined && changeInfo.status == "complete" && tab.url == "http://www.kingdomofloathing.com/game.php" ) {
+		console.log("----- START -----");
 		// Flags represent completion of each Ench_Object set task
 		var finishedFlags = {
 			"Equipment" : false,
@@ -86,13 +87,23 @@ function APICharacterSheet(finishedFlags) {
 		});
 		
 		console.log( new_equipment_flags );
-		$.each( new_equipment_flags, function (id) {
-			if( typeof(id) === "string" ) {
-				id = parseInt(id,10);
-			}
-			equip = new Equipment(id);
-			equip.scrapeData( finishedFlags, new_equipment_flags );
-		});
+		// Add all new equipment. Check equipment finished flag and attempt to
+		// run final function when done.
+		if( !$.isEmptyObject(new_equipment_flags) ) {
+			$.each( new_equipment_flags, function (id) {
+				if( typeof(id) === "string" ) {
+					id = parseInt(id,10);
+				}
+				equip = new Equipment(id);
+				equip.scrapeData( finishedFlags, new_equipment_flags );
+			});
+		}
+		else {
+			// If no new equipment, check finished flag...
+			finishedFlags.Equipment = true;
+			// ...and attempt to run final function.
+			afterCharacterSheets(finishedFlags);
+		}
 
 		// Set finished flags and try to run post ajax script
 //		finishedFlags.Equipment = true;
@@ -139,8 +150,9 @@ function afterCharacterSheets(finishedFlags) {
 	});
 	
 	if( allFinished ) {
-		console.log("DONE");
+		chrome.runtime.sendMessage("PRINT");
 		console.log( Ench_Objects );
 		console.log( Stats );
+		console.log("----- DONE -----");
 	}
 }

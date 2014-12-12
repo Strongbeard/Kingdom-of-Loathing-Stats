@@ -133,11 +133,11 @@ function getEnchNameFromHTML( html_line ) {
 			case "item drops":
 				return Stats.itemFind;
 			case "maximum hp":
-				return Stats.hp;
+				return Stats.HP;
 			case "meat":
 				return Stats.meatFind;
 			case "maximum mp":
-				return Stats.mp;
+				return Stats.MP;
 			case "monster level":
 				return Stats.monsterLevel;
 			case "moxie":
