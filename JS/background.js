@@ -66,7 +66,7 @@ function APICharacterSheet(finishedFlags) {
 		new_equipment_ids = {};
 		$.each( charsheet_json.equipment, function( equip_slot, id ) {
 			if( id !== 0 ) {
-				new_equipment_ids[parseInt(id, 10)] = null;
+				new_equipment_ids[parseInt(id, 10)] = false;
 			}
 		});
 		console.log(new_equipment_ids);
@@ -79,23 +79,22 @@ function APICharacterSheet(finishedFlags) {
 		});
 		
 		// Add new equipment to lookup queue
-		new_equipment_flags = {};
 		$.each( new_equipment_ids, function ( id ) {
-			if( typeof( Ench_Objects.equipment[id] ) === "undefined" ) {
-				new_equipment_flags[id] = false;
+			if( typeof( Ench_Objects.equipment[id] ) !== "undefined" ) {
+				delete new_equipment_ids[id];
 			}
 		});
 		
-		console.log( new_equipment_flags );
+		console.log( new_equipment_ids );
 		// Add all new equipment. Check equipment finished flag and attempt to
 		// run final function when done.
-		if( !$.isEmptyObject(new_equipment_flags) ) {
-			$.each( new_equipment_flags, function (id) {
+		if( !$.isEmptyObject(new_equipment_ids) ) {
+			$.each( new_equipment_ids, function (id) {
 				if( typeof(id) === "string" ) {
 					id = parseInt(id,10);
 				}
 				equip = new Equipment(id);
-				equip.scrapeData( finishedFlags, new_equipment_flags );
+				equip.scrapeData( finishedFlags, new_equipment_ids );
 			});
 		}
 		else {
