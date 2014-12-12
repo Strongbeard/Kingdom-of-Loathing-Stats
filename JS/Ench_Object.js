@@ -164,8 +164,17 @@ Equipment.prototype.constructor = Equipment;
 
 // --- CONSTRUCTORS ---
 
-function Buff( id, name, enchantments ) {
+function Buff( id, name, enchantments, descId ) {
 	Ench_Object.call(this, id, name, enchantments);
+	this.descId = descId;
+	
+	if(typeof(this.descId) !== "string") {
+		throw new TypeError(this.constructor.name + " => descId should be a string. " + this.constructor.name + " = " + this);
+	}
+	
+	this.scrapeData = function( finishedFlags, new_equipment_flags ) {
+		
+	};
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);

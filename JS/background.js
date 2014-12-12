@@ -62,6 +62,8 @@ function APICharacterSheet(finishedFlags) {
 
 		console.log( charsheet_json);
 		
+		// --- EQUIPMENT ---
+		
 		// Build constant time lookup list for new equipment
 		new_equipment_ids = {};
 		$.each( charsheet_json.equipment, function( equip_slot, id ) {
@@ -71,16 +73,16 @@ function APICharacterSheet(finishedFlags) {
 		});
 		console.log(new_equipment_ids);
 		
-		// Remove old Ench_Object
+		// Remove old Equipment from Ench_Objects
 		$.each( Ench_Objects.equipment, function( id, equip ) {
-			if( typeof(new_equipment_ids[id]) === "undefined" ) {
+			if( new_equipment_ids[id] === undefined ) {
 				Ench_Objects.removeObject( "equipment", id );
 			}
 		});
 		
-		// Add new equipment to lookup queue
+		// Remove equipment already in Ench_Objects from lookup queue
 		$.each( new_equipment_ids, function ( id ) {
-			if( typeof( Ench_Objects.equipment[id] ) !== "undefined" ) {
+			if( Ench_Objects.equipment[id] !== undefined ) {
 				delete new_equipment_ids[id];
 			}
 		});
@@ -93,7 +95,7 @@ function APICharacterSheet(finishedFlags) {
 				if( typeof(id) === "string" ) {
 					id = parseInt(id,10);
 				}
-				equip = new Equipment(id);
+				var equip = new Equipment(id);
 				equip.scrapeData( finishedFlags, new_equipment_ids );
 			});
 		}
@@ -104,10 +106,29 @@ function APICharacterSheet(finishedFlags) {
 			afterCharacterSheets(finishedFlags);
 		}
 
-		// Set finished flags and try to run post ajax script
-//		finishedFlags.Equipment = true;
+		// --- BUFFS ---
 		
+		// Remove old buffs from Ench_Objects
+		$.each( Ench_Objects.buff, function( id, buff ) {
+			if( charsheet_json.effects[id] === undefined ) {
+				Ench_Objects.removeObject( "buff", id );
+			}
+		});
 		
+		// Build queue of new buffs
+		new_buff_flags = {};
+		$.each( charsheet_json.effects, function( id, buff ) {
+			if( Ench_Objects[id] === undefined  ) {
+				new_buff_flags[id] = false;
+			}
+		});
+		
+		// Add all new buffs. Check buff flag & attempt to run final
+		// function when each buff is finished.
+		$.each( new_buff_flags, function( id ) {
+			var buff = new Buff(charsheet_json.effects[id][4], charsheet_json.effects[id][0], [], id);
+			console.log(buff);
+		});
 		
 		
 		finishedFlags.Buffs = true;
