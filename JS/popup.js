@@ -71,7 +71,7 @@ function printStats() {
 	$("#meatFind").html( "Meat Find: " + GLOBAL.Stats.meatFind.percentValue + "%" );
 	$("#pickpocket").html( "Pickpocket: " + GLOBAL.Stats.pickpocket.percentValue + "%" );
 	$("#HP_Regen").html( "HP Regen: " + GLOBAL.Stats.hpRegen.minValue + "-" + GLOBAL.Stats.hpRegen.maxValue );
-	$("#MP_Regen").html( "MP Regen: " + GLOBAL.Stats.mpRegen.maxValue + "-" + GLOBAL.Stats.mpRegen.maxValue );
+	$("#MP_Regen").html( "MP Regen: " + GLOBAL.Stats.mpRegen.minValue + "-" + GLOBAL.Stats.mpRegen.maxValue );
 	$("#Adventures").html( "Extra Rollover Adventures: " + GLOBAL.Stats.adventures.value );
 	$("#FamWt").html(  );
 	$("#RangedDmg").html(  );
