@@ -67,9 +67,9 @@ function printStats() {
 	$("#mysGain").html( "Mysticality Gain: " + GLOBAL.Stats.mysGain.value + " (" + GLOBAL.Stats.mysGain.percentValue + "%)" );
 	$("#moxGain").html( "Moxie Gain: " + GLOBAL.Stats.moxGain.value + " (" + GLOBAL.Stats.moxGain.percentValue + "%)" );
 	$("#mosterLevel").html( "Monster Level: " + GLOBAL.Stats.monsterLevel.value );
-	$("#itemFind").html( "Item Find: " + GLOBAL.Stats.itemFind.value + "%" );
-	$("#meatFind").html( "Meat Find: " + GLOBAL.Stats.meatFind.value + "%" );
-	$("#pickpocket").html( "Pickpocket: " + GLOBAL.Stats.pickpocket.value + "%" );
+	$("#itemFind").html( "Item Find: " + GLOBAL.Stats.itemFind.percentValue + "%" );
+	$("#meatFind").html( "Meat Find: " + GLOBAL.Stats.meatFind.percentValue + "%" );
+	$("#pickpocket").html( "Pickpocket: " + GLOBAL.Stats.pickpocket.percentValue + "%" );
 	$("#HP_Regen").html( "HP Regen: " + GLOBAL.Stats.hpRegen.minValue + "-" + GLOBAL.Stats.hpRegen.maxValue );
 	$("#MP_Regen").html( "MP Regen: " + GLOBAL.Stats.mpRegen.maxValue + "-" + GLOBAL.Stats.mpRegen.maxValue );
 	$("#Adventures").html( "Extra Rollover Adventures: " + GLOBAL.Stats.adventures.value );
