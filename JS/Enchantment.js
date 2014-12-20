@@ -76,6 +76,7 @@ function getEnchNameFromHTML( html_line ) {
 				return Stats.initiative;
 			case "damage":
 				if( html_line.indexOf("spell") ) {
+					console.log( html_line );
 					var spellType = html_line.match(/(cold|hot|spooky|sleaze|stench)/);
 					if( spellType !== null ) {
 						switch(spellType[0]) {

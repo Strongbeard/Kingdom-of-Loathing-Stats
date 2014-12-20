@@ -108,25 +108,29 @@ function APICharacterSheet(finishedFlags) {
 
 		// --- BUFFS ---
 		
+		console.log("DELETE BUFFS");
 		// Remove old buffs from Ench_Objects
 		$.each( Ench_Objects.buff, function( id, buff ) {
-			if( charsheet_json.effects[id] === undefined ) {
+			if( charsheet_json.effects[buff.descId] === undefined ) {
+				console.log( buff );
 				Ench_Objects.removeObject( "buff", id );
 			}
 		});
-		
+
+		console.log("ADD BUFFS");
 		// Build queue of new buffs
 		new_buff_flags = {};
-		$.each( charsheet_json.effects, function( id, buff ) {
-			if( Ench_Objects[id] === undefined  ) {
+		$.each( charsheet_json.effects, function( id, buff_array ) {
+			if( Ench_Objects.buff[parseInt(buff_array[4],10)] === undefined  ) {
 				new_buff_flags[id] = false;
 			}
 		});
-		
+		console.log( new_buff_flags );
+
 		// Add all new buffs. Check buff flag & attempt to run final
 		// function when each buff is finished.
 		$.each( new_buff_flags, function( id ) {
-			var buff = new Buff(charsheet_json.effects[id][4], charsheet_json.effects[id][0], [], id);
+			var buff = new Buff(parseInt(charsheet_json.effects[id][4],10), charsheet_json.effects[id][0], [], id);
 			console.log(buff);
 		});
 		
