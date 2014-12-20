@@ -75,8 +75,7 @@ function getEnchNameFromHTML( html_line ) {
 			case "combat initiative":
 				return Stats.initiative;
 			case "damage":
-				if( html_line.indexOf("spell") ) {
-					console.log( html_line );
+				if( html_line.indexOf("spell") !== -1 ) {
 					var spellType = html_line.match(/(cold|hot|spooky|sleaze|stench)/);
 					if( spellType !== null ) {
 						switch(spellType[0]) {
