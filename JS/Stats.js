@@ -134,6 +134,7 @@ Stat.prototype.toString = function() {
 // Stats global object. Contains all Stat objects.
 Stats = {
 	"adventures" : new Stat("adventures"),
+	"allAttributes" : new Stat("allAttributes", true),
 	"allResist" : new Stat("allResist"),
 	"boozeFind" : new Stat("boozeFind"),
 	"candyFind" : new Stat("candyFind"),

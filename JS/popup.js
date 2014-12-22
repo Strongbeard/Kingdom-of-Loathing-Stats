@@ -34,9 +34,9 @@ function printStats() {
 //	printStat( "mox", GLOBAL.Stats.mox, "Moxie Mod");
 //	printStat( "HP", GLOBAL.Stats.hp, "HP Mod");
 //	printStat( "MP", GLOBAL.Stats.mp, "MP Mod");
-	$("#mus").html( "Muscle Mod: " + GLOBAL.Stats.mus.value + " (" + GLOBAL.Stats.mus.percentValue + "%)" );
-	$("#mys").html( "Mysticality Mod: " + GLOBAL.Stats.mys.value + " (" + GLOBAL.Stats.mys.percentValue + "%)" );
-	$("#mox").html( "Moxie Mod: " + GLOBAL.Stats.mox.value + " (" + GLOBAL.Stats.mox.percentValue + "%)" );
+	$("#mus").html( "Muscle Mod: " + (GLOBAL.Stats.mus.value + GLOBAL.Stats.allAttributes.value) + " (" + (GLOBAL.Stats.mus.percentValue + GLOBAL.Stats.allAttributes.percentValue) + "%)" );
+	$("#mys").html( "Mysticality Mod: " + (GLOBAL.Stats.mys.value + GLOBAL.Stats.allAttributes.value) + " (" + (GLOBAL.Stats.mys.percentValue + GLOBAL.Stats.allAttributes.percentValue) + "%)" );
+	$("#mox").html( "Moxie Mod: " + (GLOBAL.Stats.mox.value + GLOBAL.Stats.allAttributes.value) + " (" + (GLOBAL.Stats.mox.percentValue + GLOBAL.Stats.allAttributes.percentValue) + "%)" );
 	$("#HP").html( "HP Mod: " + GLOBAL.Stats.HP.value + " (" + GLOBAL.Stats.HP.percentValue + "%)" );
 	$("#MP").html( "MP Mod: " + GLOBAL.Stats.MP.value + " (" + GLOBAL.Stats.MP.percentValue + "%)" );
 	$("#WDmg").html( "WeaponDmg Mod: <b>" + GLOBAL.Stats.weaponDmg.value + " (" + GLOBAL.Stats.weaponDmg.percentValue + "%) " +

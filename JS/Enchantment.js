@@ -65,13 +65,11 @@ function EnchantmentFromHtml( html_line, ench_obj ) {
 
 function getEnchNameFromHTML( html_line ) {
 	html_line = html_line.toLowerCase();
-	var name = html_line.match(/(damage|resistance|stat|combat initiative|monster level|item drops|meat|pickpocket|regenerate|adventure|muscle|mysticality|moxie|all attributes|maximum hp|maximum mp|familiar weight)/);
+	var name = html_line.match(/(damage|resistance|stat|combat initiative|monster level|item drops|meat|pickpocket|regenerate|adventure|muscle|mysticality|moxie|all attributes|maximum hp|maximum mp|familiar weight|stat\(?s?\)? per fight|gains)/);
 	if( name !== null ) {
 		switch(name[0]) {
 			case "adventure":
 				return Stats.adventures;
-			case "all attributes":
-				return Stats.randGain;
 			case "combat initiative":
 				return Stats.initiative;
 			case "damage":
@@ -134,6 +132,24 @@ function getEnchNameFromHTML( html_line ) {
 					}
 				}
 				break;
+			case "stat per fight":
+			case "stats per fight":
+			case "stat(s) per fight": // Intentional. Allows multiple cases to
+			case "gains": // take same action without repeat code
+				var statType = html_line.match(/(moxie|muscle|mysticality)/);
+				if( statType !== null ) {
+					switch(statType[0]) {
+						case "moxie":
+							return Stats.moxGain;
+						case "muscle":
+							return Stats.musGain;
+						case "mysticality":
+							return Stats.mysGain;
+						default:
+							return Stats.randGain;
+					}
+				}
+				break;
 			case "familiar weight":
 				return Stats.familiarWeight;
 			case "item drops":
@@ -152,6 +168,8 @@ function getEnchNameFromHTML( html_line ) {
 				return Stats.mus;
 			case "mysticality":
 				return Stats.mys;
+			case "all attributes":
+				return Stats.allAttributes;
 			case "pickpocket":
 				return Stats.pickpocket;
 			case "regenerate":

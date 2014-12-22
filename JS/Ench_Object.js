@@ -247,6 +247,7 @@ function Buff( id, name, enchantments, descId ) {
 		}).fail( function( jqXHR, textStatus, errorThrown ) {
 			console.error(errorThrown);
 		}).always( function() {
+			console.log("HERE");
 			buff.finishedCall(new_buff_flags, finishedFlags, buff.descId);
 		});
 	};

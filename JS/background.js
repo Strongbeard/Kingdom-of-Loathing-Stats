@@ -129,12 +129,19 @@ function APICharacterSheet(finishedFlags) {
 
 		// Add all new buffs. Check buff flag & attempt to run final
 		// function when each buff is finished.
-		$.each( new_buff_flags, function( id ) {
-			var buff = new Buff(parseInt(charsheet_json.effects[id][4],10), charsheet_json.effects[id][0], [], id);
-			buff.scrapeData( finishedFlags, new_equipment_ids );
-			console.log(buff);
-		});
-		
+		if( !$.isEmptyObject(new_buff_flags) ) {
+			$.each( new_buff_flags, function( id ) {
+				var buff = new Buff(parseInt(charsheet_json.effects[id][4],10), charsheet_json.effects[id][0], [], id);
+				buff.scrapeData( finishedFlags, new_buff_flags );
+				console.log(buff);
+			});
+		}
+		else {
+			// If no new equipment, check finished flag...
+			finishedFlags.Buffs = true;
+			// ...and attempt to run final function.
+			afterCharacterSheets(finishedFlags);
+		}
 		
 		//finishedFlags.Buffs = true;
 		finishedFlags.Outfit = true;
