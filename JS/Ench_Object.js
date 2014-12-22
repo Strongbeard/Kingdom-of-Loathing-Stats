@@ -53,6 +53,32 @@ Ench_Object.prototype.removeAllEnchantments = function() {
 	this.enchantments = new Array();
 };
 
+Ench_Object.prototype.finishedCall = function(new_ench_obj_flags, finishedFlags, id) {
+	// --- All Finished Call Attempt ---
+	// Set this equipment id to finished (true)
+	new_ench_obj_flags[id] = true;
+	
+	// Check if all new equipment is finished processing
+	setFinishedFlag = true;
+	$.each(new_ench_obj_flags, function(id, value) {
+		if( !value ) {
+			setFinishedFlag = false;
+		}
+	});
+	if( this.category === "Buffs" ) {
+	console.log( new_ench_obj_flags );
+	}
+	// Attempt to call process to run after all AJAX finished
+	if( setFinishedFlag ) {
+		finishedFlags[this.category] = true;
+		afterCharacterSheets(finishedFlags);
+		if( this.category === "Buffs" ) {
+		console.log(finishedFlags);
+		console.log(this.category);
+		}
+	}
+};
+
 // --- ACCESSORS ---
 
 // Print psudo-JSON representation of object.
@@ -71,6 +97,7 @@ Ench_Object.prototype.toString = function() {
 function Equipment( id, name, enchantments ) {
 	// Call Parent Constructor Ench_Object
 	Ench_Object.call(this, id, name, enchantments);
+	this.category = "Equipment";
 
 	this.scrapeData = function ( finishedFlags, new_equipment_flags ) {
 		var equip = this;
@@ -88,10 +115,10 @@ function Equipment( id, name, enchantments ) {
 			}).done( function( equipment_html, status, xhr ) {
 				// --- Equipment HTML Scrape ---
 				var doc = new DOMParser().parseFromString( equipment_html, "text/html");
-				console.log(doc);
+//				console.log(doc);
 				// Scrape equipment name & enchantment text from html
 				equip.name = $( "#description>center>b", doc )[0].innerText;
-				enchantments = $("blockquote>center>b>font", doc);
+				var enchantments = $("blockquote>center>b>font", doc);
 				if( enchantments.length > 0 ) {
 					// Loop through all enchantment text lines
 					enchantments = enchantments[0].innerText.split(/\n+/);
@@ -108,7 +135,7 @@ function Equipment( id, name, enchantments ) {
 			}).fail( function( jqXHR, textStatus, errorThrown ) {
 				console.error(errorThrown);
 			}).always( function() {
-				// --- All Finished Call Attempt ---
+/*				// --- All Finished Call Attempt ---
 				// Whether success or failure on 2nd ajax call, finished
 				// flag must be set to true.
 				
@@ -127,10 +154,11 @@ function Equipment( id, name, enchantments ) {
 				if( setFinishedFlag ) {
 					finishedFlags.Equipment = true;
 					afterCharacterSheets(finishedFlags);
-				}
+				}*/
+				equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
 			});
 		}).fail( function( jqXHR, textStatus, errorThrown ) {
-			// On first ajax call failure, throw error and set completion
+/*			// On first ajax call failure, throw error and set completion
 			// flag to true.
 			console.error(errorThrown);
 			
@@ -150,7 +178,8 @@ function Equipment( id, name, enchantments ) {
 			if( setFinishedFlag ) {
 				finishedFlags.Equipment = true;
 				afterCharacterSheets(finishedFlags);
-			}
+			}*/
+			equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
 		});
 	};
 	
@@ -166,6 +195,7 @@ Equipment.prototype.constructor = Equipment;
 
 function Skill( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
+	this.category = "Skills";
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
@@ -180,21 +210,44 @@ Skill.prototype.constructor = Skill;
 
 function Buff( id, name, enchantments, descId ) {
 	Ench_Object.call(this, id, name, enchantments);
+	this.category = "Buffs";
 	this.descId = descId;
 	
 	if(typeof(this.descId) !== "string") {
 		throw new TypeError(this.constructor.name + " => descId should be a string. " + this.constructor.name + " = " + this);
 	}
 	
-	this.scrapeData = function( finishedFlags, new_equipment_flags ) {
+	this.scrapeData = function( finishedFlags, new_buff_flags ) {
 		var buff = this;
 		$.ajax({
 			async: true,
-			dataType: "json",
+			dataType: "html",
 			type: "GET",
-			url: "http://www.kingdomofloathing.com/api.php?what=item&for=Kol_Tool&id=" + equip.id
-		}).done( function( equipmentIdJSON, status, xhr ) {
+			url: "http://www.kingdomofloathing.com/desc_effect.php?whicheffect=" + buff.descId
+		}).done( function( buff_html, status, xhr ) {
+			// ### WORK HERE ###
+			var doc = new DOMParser().parseFromString( buff_html, "text/html");
+			console.log(doc);
+			var enchantments = $("#description>font>center>font>b", doc);
+			console.log(enchantments);
+			if( enchantments.length > 0 ) {
+					// Loop through all enchantment text lines
+					enchantments = enchantments[0].innerText.split(/\n+/);
+					enchantments.forEach( function(enchantment_text, index, array) {
+						if( enchantment_text !== "" ) {
+							// Create enchantment
+							var ench = EnchantmentFromHtml(enchantment_text, buff);
+							if( ench !== null ) {
+							console.log(ench);
+								this.addEnchantment( ench );
+							}
+						}
+					}, buff);
+				}
 		}).fail( function( jqXHR, textStatus, errorThrown ) {
+			console.error(errorThrown);
+		}).always( function() {
+			buff.finishedCall(new_buff_flags, finishedFlags, buff.descId);
 		});
 	};
 	
@@ -211,6 +264,7 @@ Buff.prototype.constructor = Buff;
 
 function Outfit( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
+	this.category = "Outfit";
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
@@ -225,6 +279,7 @@ Outfit.prototype.constructor = Outfit;
 
 function Sign( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
+	this.category = "Sign";
 
 	
 	// Add self to Ench_Objects to enable tracking of this object

@@ -68,7 +68,7 @@ Stat.prototype.addEnchantment = function( enchantment ) {
 	
 	// Add enchantment to the appropriate associative array using it's
 	// ench_obj id as a key
-	this.ench_list[enchantment.ench_obj.constructor.name.toLowerCase()][enchantment.ench_obj.id] = enchantment;
+	this.ench_list[enchantment.ench_obj.category.toLowerCase()][enchantment.ench_obj.id] = enchantment;
 }
 
 Stat.prototype.removeEnchantment = function( enchantment ) {
@@ -134,6 +134,7 @@ Stat.prototype.toString = function() {
 // Stats global object. Contains all Stat objects.
 Stats = {
 	"adventures" : new Stat("adventures"),
+	"allResist" : new Stat("allResist"),
 	"boozeFind" : new Stat("boozeFind"),
 	"candyFind" : new Stat("candyFind"),
 	"coldResist" : new Stat("coldResist"),

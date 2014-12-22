@@ -124,7 +124,13 @@ function getEnchNameFromHTML( html_line ) {
 						}
 					}
 					else {
-						return Stats.weaponDmg;
+						if( html_line.indexOf("attacking opponent") !== -1 ) {
+							console.warn("Enchantment not displayed: " + html_line);
+							return null;
+						}
+						else {
+							return Stats.weaponDmg;
+						}
 					}
 				}
 				break;
@@ -167,9 +173,11 @@ function getEnchNameFromHTML( html_line ) {
 				}
 				break;
 			case "resistance":
-				var resistType = html_line.match(/(cold|hot|spooky|sleaze|stench)/);
+				var resistType = html_line.match(/(all elements|cold|hot|spooky|sleaze|stench)/);
 				if( resistType !== null ) {
 					switch(resistType[0]) {
+						case "all elements":
+							return Stats.allResist;
 						case "cold":
 							return Stats.coldResist;
 						case "hot":
@@ -215,6 +223,7 @@ function getEnchValueFromHTML(html_line, stat) {
 		];
 	}
 	else {
+		//return (value === null) ? 0 : parseInt(value[0].replace(/\s+/,""),10);
 		return parseInt(value[0].replace(/\s+/,""),10);
 	}
 }

@@ -57,12 +57,12 @@ function printStats() {
 	$("#init").html( "Combat Initiative: " + GLOBAL.Stats.initiative.value + "%" );
 	$("#DA").html( "Damage Absorbtion Bonus: " + GLOBAL.Stats.damageAbsorption.value );
 	$("#DR").html( "Damage Reduction Bonus: " + GLOBAL.Stats.damageReduction.value );
-	$("#cold_resist").html( "<span class=\"cold\">Cold Resist: " + GLOBAL.Stats.coldResist.value + "</span>" );
-	$("#hot_resist").html( "<span class=\"hot\">Hot Resist: " + GLOBAL.Stats.hotResist.value + "</span>");
-	$("#sleaze_resist").html( "<span class=\"sleaze\">Sleaze Resist: " + GLOBAL.Stats.sleazeResist.value + "</span>" );
+	$("#cold_resist").html( "<span class=\"cold\">Cold Resist: " + (GLOBAL.Stats.coldResist.value + GLOBAL.Stats.allResist.value) + "</span>" );
+	$("#hot_resist").html( "<span class=\"hot\">Hot Resist: " + (GLOBAL.Stats.hotResist.value + GLOBAL.Stats.allResist.value) + "</span>");
+	$("#sleaze_resist").html( "<span class=\"sleaze\">Sleaze Resist: " + (GLOBAL.Stats.sleazeResist.value + GLOBAL.Stats.allResist.value) + "</span>" );
 	$("#slime_resist").html( "<span class=\"slime\">Slime Resist: " + GLOBAL.Stats.slimeResist.value + "</span>" );
-	$("#spooky_resist").html( "<span class=\"spooky\">Spooky Resist: " + GLOBAL.Stats.spookyResist.value + "</span>");
-	$("#stench_resist").html( "<span class=\"stench\">Stench Resist: " + GLOBAL.Stats.stenchResist.value + "</span>" );
+	$("#spooky_resist").html( "<span class=\"spooky\">Spooky Resist: " + (GLOBAL.Stats.spookyResist.value + GLOBAL.Stats.allResist.value) + "</span>");
+	$("#stench_resist").html( "<span class=\"stench\">Stench Resist: " + (GLOBAL.Stats.stenchResist.value + GLOBAL.Stats.allResist.value) + "</span>" );
 	$("#musGain").html( "Muscle Gain: " + GLOBAL.Stats.musGain.value + " (" + GLOBAL.Stats.musGain.percentValue + "%)" );
 	$("#mysGain").html( "Mysticality Gain: " + GLOBAL.Stats.mysGain.value + " (" + GLOBAL.Stats.mysGain.percentValue + "%)" );
 	$("#moxGain").html( "Moxie Gain: " + GLOBAL.Stats.moxGain.value + " (" + GLOBAL.Stats.moxGain.percentValue + "%)" );

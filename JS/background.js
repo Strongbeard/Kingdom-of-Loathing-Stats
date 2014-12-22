@@ -131,11 +131,12 @@ function APICharacterSheet(finishedFlags) {
 		// function when each buff is finished.
 		$.each( new_buff_flags, function( id ) {
 			var buff = new Buff(parseInt(charsheet_json.effects[id][4],10), charsheet_json.effects[id][0], [], id);
+			buff.scrapeData( finishedFlags, new_equipment_ids );
 			console.log(buff);
 		});
 		
 		
-		finishedFlags.Buffs = true;
+		//finishedFlags.Buffs = true;
 		finishedFlags.Outfit = true;
 		finishedFlags.Sign = true;
 		afterCharacterSheets(finishedFlags);
@@ -166,6 +167,7 @@ function HTMLCharacterSheet(finishedFlags) {
 }
 
 function afterCharacterSheets(finishedFlags) {
+	console.log(finishedFlags);
 	var allFinished = true;
 	$.each(finishedFlags, function(key, value) {
 		if( !value ) {
