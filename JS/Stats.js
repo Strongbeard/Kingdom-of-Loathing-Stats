@@ -108,7 +108,10 @@ Stat.prototype.removeEnchantment = function( enchantment ) {
 		}
 	}
 	
-	delete this.ench_list[enchantment.ench_obj.constructor.name.toLowerCase()][enchantment.ench_obj.id];
+	// FIX FOR STAT HAVING AN "s" ON THE END OF "buff" and "skill"
+	var ench_object_type = enchantment.ench_obj.constructor.name.toLowerCase();
+	ench_object_type = (ench_object_type === "buff" || ench_object_type === "skill") ? ench_object_type + "s" : ench_object_type;
+	delete this.ench_list[ench_object_type][enchantment.ench_obj.id];
 }
 
 // --- ACCESSORS ---
