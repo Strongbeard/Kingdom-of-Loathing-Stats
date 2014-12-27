@@ -54,7 +54,7 @@ function printStats() {
 		"<span class=\"sleaze\">" + GLOBAL.Stats.sleazeSpellDmg.value + " (" + GLOBAL.Stats.sleazeSpellDmg.percentValue + "%)</span></b> "
 	);
 	$("#RangedDmg").html( "RangedDmg Mod: <b>" + GLOBAL.Stats.rangedDmg.value + "</b>" );
-	$("#init").html( "Combat Initiative: " + GLOBAL.Stats.initiative.value + "%" );
+	$("#init").html( "Combat Initiative: " + GLOBAL.Stats.initiative.percentValue + "%" );
 	$("#DA").html( "Damage Absorbtion Bonus: " + GLOBAL.Stats.damageAbsorption.value );
 	$("#DR").html( "Damage Reduction Bonus: " + GLOBAL.Stats.damageReduction.value );
 	$("#cold_resist").html( "<span class=\"cold\">Cold Resist: " + (GLOBAL.Stats.coldResist.value + GLOBAL.Stats.allResist.value) + "</span>" );

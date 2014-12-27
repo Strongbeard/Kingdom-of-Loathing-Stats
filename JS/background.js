@@ -184,7 +184,9 @@ function afterCharacterSheets(finishedFlags) {
 	
 	if( allFinished ) {
 		chrome.runtime.sendMessage("PRINT");
+		console.log("ENCH_OBJECTS:");
 		console.log( Ench_Objects );
+		console.log("STATS:");
 		console.log( Stats );
 		console.log("----- DONE -----");
 	}
