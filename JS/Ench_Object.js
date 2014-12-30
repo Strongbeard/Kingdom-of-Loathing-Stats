@@ -98,96 +98,57 @@ function Equipment( id, name, enchantments ) {
 	// Call Parent Constructor Ench_Object
 	Ench_Object.call(this, id, name, enchantments);
 	this.category = "Equipment";
-
-	this.scrapeData = function ( finishedFlags, new_equipment_flags ) {
-		var equip = this;
-		$.ajax({
-			async: true,
-			dataType: "json",
-			type: "GET",
-			url: "http://www.kingdomofloathing.com/api.php?what=item&for=Kol_Tool&id=" + equip.id
-		}).done( function( equipmentIdJSON, status, xhr ) {
-			$.ajax({
-				async: true,
-				dataType: "html",
-				type: "GET",
-				url: "http://www.kingdomofloathing.com/desc_item.php?whichitem=" + equipmentIdJSON.descid
-			}).done( function( equipment_html, status, xhr ) {
-				// --- Equipment HTML Scrape ---
-				var doc = new DOMParser().parseFromString( equipment_html, "text/html");
-//				console.log(doc);
-				// Scrape equipment name & enchantment text from html
-				equip.name = $( "#description>center>b", doc )[0].innerText;
-				var enchantments = $("blockquote>center>b>font", doc);
-				if( enchantments.length > 0 ) {
-					// Loop through all enchantment text lines
-					enchantments = enchantments[0].innerText.split(/\n+/);
-					enchantments.forEach( function(enchantment_text, index, array) {
-						if( enchantment_text !== "" ) {
-							// Create enchantment
-							ench = EnchantmentFromHtml(enchantment_text, equip);
-							if( ench !== null ) {
-								this.addEnchantment( ench );
-							}
-						}
-					}, equip);
-				}
-			}).fail( function( jqXHR, textStatus, errorThrown ) {
-				console.error(errorThrown);
-			}).always( function() {
-/*				// --- All Finished Call Attempt ---
-				// Whether success or failure on 2nd ajax call, finished
-				// flag must be set to true.
-				
-				// Set this equipment id to finished (true)
-				new_equipment_flags[equip.id] = true;
-				
-				// Check if all new equipment is finished processing
-				setFinishedFlag = true;
-				$.each(new_equipment_flags, function(id, value) {
-					if( !value ) {
-						setFinishedFlag = false;
-					}
-				});
-				
-				// Attempt to call process to run after all AJAX finished
-				if( setFinishedFlag ) {
-					finishedFlags.Equipment = true;
-					afterCharacterSheets(finishedFlags);
-				}*/
-				equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
-			});
-		}).fail( function( jqXHR, textStatus, errorThrown ) {
-/*			// On first ajax call failure, throw error and set completion
-			// flag to true.
-			console.error(errorThrown);
-			
-			// --- All Finished Call Attempt ---
-			// Set this equipment id to finished (true)
-			new_equipment_flags[equip.id] = true;
-			
-			// Check if all new equipment is finished processing
-			setFinishedFlag = true;
-			$.each(new_equipment_flags, function(id, value) {
-				if( !value ) {
-					setFinishedFlag = false;
-				}
-			});
-			
-			// Attempt to call process to run after all AJAX finished
-			if( setFinishedFlag ) {
-				finishedFlags.Equipment = true;
-				afterCharacterSheets(finishedFlags);
-			}*/
-			equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
-		});
-	};
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
 };
 Equipment.prototype = Object.create(Ench_Object.prototype);
 Equipment.prototype.constructor = Equipment;
+
+// --- FUNCTIONS ---
+
+Equipment.prototype.scrapeData = function( finishedFlags, new_equipment_flags ) {
+	var equip = this;
+	$.ajax({
+		async: true,
+		dataType: "json",
+		type: "GET",
+		url: "http://www.kingdomofloathing.com/api.php?what=item&for=Kol_Tool&id=" + equip.id
+	}).done( function( equipmentIdJSON, status, xhr ) {
+		$.ajax({
+			async: true,
+			dataType: "html",
+			type: "GET",
+			url: "http://www.kingdomofloathing.com/desc_item.php?whichitem=" + equipmentIdJSON.descid
+		}).done( function( equipment_html, status, xhr ) {
+			// --- Equipment HTML Scrape ---
+			var doc = new DOMParser().parseFromString( equipment_html, "text/html");
+			// Scrape equipment name & enchantment text from html
+			equip.name = $( "#description>center>b", doc )[0].innerText;
+			var enchantments = $("blockquote>center>b>font", doc);
+			if( enchantments.length > 0 ) {
+				// Loop through all enchantment text lines
+				enchantments = enchantments[0].innerText.split(/\n+/);
+				enchantments.forEach( function(enchantment_text, index, array) {
+					if( enchantment_text !== "" ) {
+						// Create enchantment
+						ench = EnchantmentFromHtml(enchantment_text, equip);
+						if( ench !== null ) {
+							this.addEnchantment( ench );
+						}
+					}
+				}, equip);
+			}
+		}).fail( function( jqXHR, textStatus, errorThrown ) {
+			console.error(errorThrown);
+		}).always( function() {
+			equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
+		});
+	}).fail( function( jqXHR, textStatus, errorThrown ) {
+		equip.finishedCall(new_equipment_flags, finishedFlags, equip.id);
+	});
+};
+
 
 //################################# SKILL ##################################
 
@@ -217,7 +178,15 @@ function Buff( id, name, enchantments, descId ) {
 		throw new TypeError(this.constructor.name + " => descId should be a string. " + this.constructor.name + " = " + this);
 	}
 	
-	this.scrapeData = function( finishedFlags, new_buff_flags ) {
+	// Add self to Ench_Objects to enable tracking of this object
+	Ench_Objects.addObject(this);
+};
+Buff.prototype = Object.create(Ench_Object.prototype);
+Buff.prototype.constructor = Buff;
+
+// --- FUNCTIONS ---
+
+Buff.prototype.scrapeData = function( finishedFlags, new_buff_flags ) {
 		var buff = this;
 		$.ajax({
 			async: true,
@@ -251,12 +220,6 @@ function Buff( id, name, enchantments, descId ) {
 			buff.finishedCall(new_buff_flags, finishedFlags, buff.descId);
 		});
 	};
-	
-	// Add self to Ench_Objects to enable tracking of this object
-	Ench_Objects.addObject(this);
-};
-Buff.prototype = Object.create(Ench_Object.prototype);
-Buff.prototype.constructor = Buff;
 
 
 //################################# OUTFIT ##################################
