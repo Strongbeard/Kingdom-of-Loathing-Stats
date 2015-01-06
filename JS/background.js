@@ -62,7 +62,7 @@ function APICharacterSheet(finishedFlags) {
 
 		console.log( charsheet_json);
 		
-		// --- EQUIPMENT ---
+		// ##### EQUIPMENT #####
 		
 		// Build constant time lookup list for new equipment
 		new_equipment_ids = {};
@@ -71,7 +71,7 @@ function APICharacterSheet(finishedFlags) {
 				new_equipment_ids[parseInt(id, 10)] = false;
 			}
 		});
-		console.log(new_equipment_ids);
+//		console.log(new_equipment_ids);
 		
 		// Remove old Equipment from Ench_Objects
 		$.each( Ench_Objects.equipment, function( id, equip ) {
@@ -87,7 +87,7 @@ function APICharacterSheet(finishedFlags) {
 			}
 		});
 		
-		console.log( new_equipment_ids );
+//		console.log( new_equipment_ids );
 		// Add all new equipment. Check equipment finished flag and attempt to
 		// run final function when done.
 		if( !$.isEmptyObject(new_equipment_ids) ) {
@@ -106,18 +106,18 @@ function APICharacterSheet(finishedFlags) {
 			afterCharacterSheets(finishedFlags);
 		}
 
-		// --- BUFFS ---
+		// ##### BUFFS #####
 		
-		console.log("DELETE BUFFS");
+//		console.log("DELETE BUFFS");
 		// Remove old buffs from Ench_Objects
 		$.each( Ench_Objects.buff, function( id, buff ) {
 			if( charsheet_json.effects[buff.descId] === undefined ) {
-				console.log( buff );
+//				console.log( buff );
 				Ench_Objects.removeObject( "buff", id );
 			}
 		});
 
-		console.log("ADD BUFFS");
+//		console.log("ADD BUFFS");
 		// Build queue of new buffs
 		new_buff_flags = {};
 		$.each( charsheet_json.effects, function( id, buff_array ) {
@@ -125,7 +125,7 @@ function APICharacterSheet(finishedFlags) {
 				new_buff_flags[id] = false;
 			}
 		});
-		console.log( new_buff_flags );
+//		console.log( new_buff_flags );
 
 		// Add all new buffs. Check buff flag & attempt to run final
 		// function when each buff is finished.
@@ -133,7 +133,7 @@ function APICharacterSheet(finishedFlags) {
 			$.each( new_buff_flags, function( id ) {
 				var buff = new Buff(parseInt(charsheet_json.effects[id][4],10), charsheet_json.effects[id][0], [], id);
 				buff.scrapeData( finishedFlags, new_buff_flags );
-				console.log(buff);
+//				console.log(buff);
 			});
 		}
 		else {
@@ -142,9 +142,9 @@ function APICharacterSheet(finishedFlags) {
 			// ...and attempt to run final function.
 			afterCharacterSheets(finishedFlags);
 		}
-		
-		//finishedFlags.Buffs = true;
-		finishedFlags.Outfit = true;
+
+		// ##### SIGN #####
+
 		finishedFlags.Sign = true;
 		afterCharacterSheets(finishedFlags);
 	}).fail( function( jqXHR, textStatus, errorThrown ) {
@@ -164,9 +164,24 @@ function HTMLCharacterSheet(finishedFlags) {
 		var doc = parser.parseFromString(charsheet_html,"text/html");
 		console.log( doc );
 
+		// ##### SKILLS #####
 
 		// Set finished flags and try to run post ajax script
 		finishedFlags.Skills = true;
+		
+		// ##### OUTFIT #####
+		
+		var outfit_selector = $("body>center>table>tbody>tr>td>center>table>tbody>tr>td>center>center>table>tbody>tr", doc);
+		//>table>tbody>tr>td>center>table>tbody>tr>td>center>center>table>tbody>tr
+		console.log("OUTFIT SELECTOR:");
+		console.log(outfit_selector);
+		if( outfit_selector.length > 0 && outfit_selector[outfit_selector.length-2].innerText.indexOf("Outfit:") !== -1 ) {
+			console.log( outfit_selector[outfit_selector.length-2] );
+			console.log($("tr>td>b>span", outfit_selector[outfit_selector.length-2] ));
+		}
+		
+		finishedFlags.Outfit = true;
+		
 		afterCharacterSheets(finishedFlags);
 	}).fail( function( jqHHR, textStatus, errorThrown ) {
 		console.error(errorThrown);

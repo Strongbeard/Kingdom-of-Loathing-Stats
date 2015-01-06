@@ -164,6 +164,10 @@ function Skill( id, name, enchantments ) {
 Skill.prototype = Object.create(Ench_Object.prototype);
 Skill.prototype.constructor = Skill;
 
+Skill.prototype.scrapeData = function( finishedFlags, new_skill_flags ) {
+	var skill = this;
+};
+
 
 //################################# BUFF ##################################
 
@@ -196,9 +200,7 @@ Buff.prototype.scrapeData = function( finishedFlags, new_buff_flags ) {
 		}).done( function( buff_html, status, xhr ) {
 			// ### WORK HERE ###
 			var doc = new DOMParser().parseFromString( buff_html, "text/html");
-			console.log(doc);
 			var enchantments = $("#description>font>center>font>b", doc);
-			console.log(enchantments);
 			if( enchantments.length > 0 ) {
 					// Loop through all enchantment text lines
 					enchantments = enchantments[0].innerText.split(/\n+/);
