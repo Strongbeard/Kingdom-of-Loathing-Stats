@@ -68,7 +68,13 @@ Stat.prototype.addEnchantment = function( enchantment ) {
 	
 	// Add enchantment to the appropriate associative array using it's
 	// ench_obj id as a key
-	this.ench_list[enchantment.ench_obj.category.toLowerCase()][enchantment.ench_obj.id] = enchantment;
+	var category = enchantment.ench_obj.category.toLowerCase();
+	if( this.ench_list[category] instanceof Ench_Object || this.ench_list[category] === null ) {
+		this.ench_list[category] = enchantment;
+	}
+	else {
+		this.ench_list[category][enchantment.ench_obj.id] = enchantment;
+	}
 }
 
 Stat.prototype.removeEnchantment = function( enchantment ) {
@@ -111,7 +117,17 @@ Stat.prototype.removeEnchantment = function( enchantment ) {
 	// FIX FOR STAT HAVING AN "s" ON THE END OF "buff" and "skill"
 	var ench_object_type = enchantment.ench_obj.constructor.name.toLowerCase();
 	ench_object_type = (ench_object_type === "buff" || ench_object_type === "skill") ? ench_object_type + "s" : ench_object_type;
-	delete this.ench_list[ench_object_type][enchantment.ench_obj.id];
+	switch(ench_object_type) {
+		case "outfit":
+		case "sign":
+			this.ench_list[ench_object_type] = null;
+			break;
+		case "equipment":
+		case "buffs":
+		case "skills":
+			delete this.ench_list[ench_object_type][enchantment.ench_obj.id];
+			break;
+	}
 }
 
 // --- ACCESSORS ---

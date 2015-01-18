@@ -191,37 +191,37 @@ Buff.prototype.constructor = Buff;
 // --- FUNCTIONS ---
 
 Buff.prototype.scrapeData = function( finishedFlags, new_buff_flags ) {
-		var buff = this;
-		$.ajax({
-			async: true,
-			dataType: "html",
-			type: "GET",
-			url: "http://www.kingdomofloathing.com/desc_effect.php?whicheffect=" + buff.descId
-		}).done( function( buff_html, status, xhr ) {
-			// ### WORK HERE ###
-			var doc = new DOMParser().parseFromString( buff_html, "text/html");
-			var enchantments = $("#description>font>center>font>b", doc);
-			if( enchantments.length > 0 ) {
-					// Loop through all enchantment text lines
-					enchantments = enchantments[0].innerText.split(/\n+/);
-					enchantments.forEach( function(enchantment_text, index, array) {
-						if( enchantment_text !== "" ) {
-							// Create enchantment
-							var ench = EnchantmentFromHtml(enchantment_text, buff);
-							if( ench !== null ) {
-							console.log(ench);
-								this.addEnchantment( ench );
-							}
+	var buff = this;
+	$.ajax({
+		async: true,
+		dataType: "html",
+		type: "GET",
+		url: "http://www.kingdomofloathing.com/desc_effect.php?whicheffect=" + buff.descId
+	}).done( function( buff_html, status, xhr ) {
+		// ### WORK HERE ###
+		var doc = new DOMParser().parseFromString( buff_html, "text/html");
+		var enchantments = $("#description>font>center>font>b", doc);
+		if( enchantments.length > 0 ) {
+				// Loop through all enchantment text lines
+				enchantments = enchantments[0].innerText.split(/\n+/);
+				enchantments.forEach( function(enchantment_text, index, array) {
+					if( enchantment_text !== "" ) {
+						// Create enchantment
+						var ench = EnchantmentFromHtml(enchantment_text, buff);
+						if( ench !== null ) {
+						console.log(ench);
+							this.addEnchantment( ench );
 						}
-					}, buff);
-				}
-		}).fail( function( jqXHR, textStatus, errorThrown ) {
-			console.error(errorThrown);
-		}).always( function() {
-			console.log("HERE");
-			buff.finishedCall(new_buff_flags, finishedFlags, buff.descId);
-		});
-	};
+					}
+				}, buff);
+			}
+	}).fail( function( jqXHR, textStatus, errorThrown ) {
+		console.error(errorThrown);
+	}).always( function() {
+		console.log("HERE");
+		buff.finishedCall(new_buff_flags, finishedFlags, buff.descId);
+	});
+};
 
 
 //################################# OUTFIT ##################################
@@ -237,6 +237,40 @@ function Outfit( id, name, enchantments ) {
 };
 Outfit.prototype = Object.create(Ench_Object.prototype);
 Outfit.prototype.constructor = Outfit;
+
+// --- FUNCTIONS ---
+Outfit.prototype.scrapeData = function( finishedFlags, new_outfit_flags ) {
+	var outfit = this;
+	$.ajax({
+		async: true,
+		dataType: "html",
+		type: "GET",
+		url: "http://www.kingdomofloathing.com/desc_outfit.php?whichoutfit=" + outfit.id
+	}).done( function( outfit_html, status, xhr ) {
+		var doc = new DOMParser().parseFromString( outfit_html, "text/html" );
+		outfit.name = $("#description>center>font>b", doc)[0].innerText;
+		var enchantments = $("#description>center>p>font>b>font", doc);
+		console.log( enchantments );
+		// Loop through all enchantment text lines
+		enchantments = enchantments[0].innerText.split(/\n+/);
+		enchantments.forEach( function(enchantment_text, index, array) {
+			if( enchantment_text !== "" ) {
+				// Create enchantment
+				var ench = EnchantmentFromHtml(enchantment_text, outfit);
+				if( ench !== null ) {
+				console.log(ench);
+					this.addEnchantment( ench );
+				}
+			}
+		}, outfit);
+	}).fail( function( jqXHR, textStatus, errorThrown ) {
+		console.error(errorThrown);
+	}).always( function() {
+		console.log("OUTFIT DONE");
+		finishedFlags.Outfit = true;
+		afterCharacterSheets(finishedFlags);
+	});
+};
 
 
 //################################# SIGN ##################################
@@ -270,8 +304,14 @@ Ench_Objects = {
 			throw new TypeError("Ench_Objects::addObject() => ench_obj must inherit from the Ench_Object class.");
 		}
 
-		// Add object to proper list
-		this[ench_obj.constructor.name.toLowerCase()][ench_obj.id] = ench_obj;
+		// Add object to proper list/category in Ench_Objects
+		var ench_obj_type = ench_obj.constructor.name.toLowerCase();
+		if( this[ench_obj_type] === null || this[ench_obj_type] instanceof Ench_Object ) {
+			this[ench_obj.constructor.name.toLowerCase()] = ench_obj;
+		}
+		else {
+			this[ench_obj.constructor.name.toLowerCase()][ench_obj.id] = ench_obj;
+		}
 	},
 	removeObject : function( type, id ) {
 		// Argument Type Error Checking
@@ -279,17 +319,25 @@ Ench_Objects = {
 			throw new TypeError("Ench_Objects::removeObject() => type must be one of the following strings: \"equipment\", \"skills\", \"buffs\", \"outfit\", or \"sign\"");
 		}
 		
-		if( typeof(id) === "string" ) {
-			id = parseInt(id,10);
-		}
-		if( typeof(id) !== "number" ) {
-			throw new TypeError("Ench_Objects::removeObject() => id must be a number.");
+		if( typeof(id) !== "undefined" ) {
+			if( typeof(id) === "string" ) {
+				id = parseInt(id,10);
+			}
+			if( typeof(id) !== "number" ) {
+				throw new TypeError("Ench_Objects::removeObject() => id must be a number.");
+			}
 		}
 		
-		// Remove enchantments from the object (& stats variable)
-		this[type][id].removeAllEnchantments();
-		
-		// Remove the object from 
-		delete this[type][id];
+		// Remove enchantments from the object (& stats variable) and then
+		// Remove the object itself from Ench_Objects
+		console.log(id);
+		if( typeof(id) !== "undefined" ) {
+			this[type][id].removeAllEnchantments();
+			delete this[type][id];
+		}
+		else if( this[type] !== null ) {
+			this[type].removeAllEnchantments();
+			this[type][id] = null;
+		}
 	}
 };

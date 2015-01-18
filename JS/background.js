@@ -71,10 +71,11 @@ function APICharacterSheet(finishedFlags) {
 				new_equipment_ids[parseInt(id, 10)] = false;
 			}
 		});
-//		console.log(new_equipment_ids);
-		
+		console.log(new_equipment_ids);
+		console.log(Ench_Objects);
 		// Remove old Equipment from Ench_Objects
 		$.each( Ench_Objects.equipment, function( id, equip ) {
+			console.log(id);
 			if( new_equipment_ids[id] === undefined ) {
 				Ench_Objects.removeObject( "equipment", id );
 			}
@@ -176,13 +177,30 @@ function HTMLCharacterSheet(finishedFlags) {
 		console.log("OUTFIT SELECTOR:");
 		console.log(outfit_selector);
 		if( outfit_selector.length > 0 && outfit_selector[outfit_selector.length-2].innerText.indexOf("Outfit:") !== -1 ) {
-			console.log( outfit_selector[outfit_selector.length-2] );
-			console.log($("tr>td>b>span", outfit_selector[outfit_selector.length-2] ));
+			var outfit_link_str = $("td>b>span", outfit_selector[outfit_selector.length-2]).attr("onclick");
+			outfit_link_str = outfit_link_str.substring(outfit_link_str.indexOf("whichoutfit=") + 12);
+			var outfit_id = parseInt(outfit_link_str.substr(0,outfit_link_str.indexOf("\"")),10);
+			console.log( outfit_id );
+			
+			if( Ench_Objects.outfit === null || Ench_Objects.outfit.id !== outfit_id ) {
+				Ench_Objects.removeObject( "outfit" );
+				var outfit = new Outfit(outfit_id);
+				outfit.scrapeData(finishedFlags);
+			}
+			// If outfit stayed the same, check finished flag...
+			finishedFlags.Outfit = true;
+			// ...and attempt to run final function.
+			afterCharacterSheets(finishedFlags);
+		}
+		else if(Ench_Objects.outfit !== null) {
+			// ###WORK HERE###
+			// Remove Outfit
+			Ench_Objects.removeObject( "outfit" );
+			finishedFlags.Outfit = true;
+			afterCharacterSheets(finishedFlags);
 		}
 		
-		finishedFlags.Outfit = true;
-		
-		afterCharacterSheets(finishedFlags);
+//		afterCharacterSheets(finishedFlags);
 	}).fail( function( jqHHR, textStatus, errorThrown ) {
 		console.error(errorThrown);
 	});
