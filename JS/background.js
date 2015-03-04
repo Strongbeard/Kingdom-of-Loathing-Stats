@@ -173,34 +173,28 @@ function HTMLCharacterSheet(finishedFlags) {
 		// ##### OUTFIT #####
 		
 		var outfit_selector = $("body>center>table>tbody>tr>td>center>table>tbody>tr>td>center>center>table>tbody>tr", doc);
-		//>table>tbody>tr>td>center>table>tbody>tr>td>center>center>table>tbody>tr
-		console.log("OUTFIT SELECTOR:");
-		console.log(outfit_selector);
-		if( outfit_selector.length > 0 && outfit_selector[outfit_selector.length-2].innerText.indexOf("Outfit:") !== -1 ) {
+		console.log("OUTFIT:");
+		// If new outfit found add it to the ench_objects list & stats list
+		if( outfit_selector.length >= 2 && outfit_selector[outfit_selector.length-2].innerText.indexOf("Outfit:") !== -1 ) {
 			var outfit_link_str = $("td>b>span", outfit_selector[outfit_selector.length-2]).attr("onclick");
 			outfit_link_str = outfit_link_str.substring(outfit_link_str.indexOf("whichoutfit=") + 12);
 			var outfit_id = parseInt(outfit_link_str.substr(0,outfit_link_str.indexOf("\"")),10);
-			console.log( outfit_id );
 			
+			// If player was already wearing an outfit, remove it
 			if( Ench_Objects.outfit === null || Ench_Objects.outfit.id !== outfit_id ) {
 				Ench_Objects.removeObject( "outfit" );
 				var outfit = new Outfit(outfit_id);
 				outfit.scrapeData(finishedFlags);
 			}
-			// If outfit stayed the same, check finished flag...
-			finishedFlags.Outfit = true;
-			// ...and attempt to run final function.
-			afterCharacterSheets(finishedFlags);
-		}
+		} // No outfit found. If player was wearing an outfit before, remove it
 		else if(Ench_Objects.outfit !== null) {
-			// ###WORK HERE###
+			// ###WORK HERE###???
 			// Remove Outfit
-			Ench_Objects.removeObject( "outfit" );
-			finishedFlags.Outfit = true;
-			afterCharacterSheets(finishedFlags);
+			Ench_Objects.removeObject( "outfit" );	
 		}
-		
-//		afterCharacterSheets(finishedFlags);
+		// Done with outfits. Set flag to true & call final function
+		finishedFlags.Outfit = true;
+		afterCharacterSheets(finishedFlags);
 	}).fail( function( jqHHR, textStatus, errorThrown ) {
 		console.error(errorThrown);
 	});
