@@ -54,6 +54,7 @@ Ench_Object.prototype.removeAllEnchantments = function() {
 };
 
 Ench_Object.prototype.finishedCall = function(new_ench_obj_flags, finishedFlags, id) {
+	console.log("start finishedCall: " + this.constructor.name);
 	// --- All Finished Call Attempt ---
 	// Set this equipment id to finished (true)
 	new_ench_obj_flags[id] = true;
@@ -65,17 +66,15 @@ Ench_Object.prototype.finishedCall = function(new_ench_obj_flags, finishedFlags,
 			setFinishedFlag = false;
 		}
 	});
-	if( this.category === "Buffs" ) {
+	
+//	if( this.constructor.name === "Buff" ) {
 	console.log( new_ench_obj_flags );
-	}
+//	}
 	// Attempt to call process to run after all AJAX finished
 	if( setFinishedFlag ) {
-		finishedFlags[this.category] = true;
+		finishedFlags[this.constructor.name] = true;
+		console.log( "end finishedCall: " + this.constructor.name);
 		afterCharacterSheets(finishedFlags);
-		if( this.category === "Buffs" ) {
-		console.log(finishedFlags);
-		console.log(this.category);
-		}
 	}
 };
 
@@ -97,7 +96,7 @@ Ench_Object.prototype.toString = function() {
 function Equipment( id, name, enchantments ) {
 	// Call Parent Constructor Ench_Object
 	Ench_Object.call(this, id, name, enchantments);
-	this.category = "Equipment";
+//	this.category = "Equipment";
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
@@ -156,7 +155,7 @@ Equipment.prototype.scrapeData = function( finishedFlags, new_equipment_flags ) 
 
 function Skill( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
-	this.category = "Skills";
+//	this.category = "Skills";
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
@@ -175,7 +174,7 @@ Skill.prototype.scrapeData = function( finishedFlags, new_skill_flags ) {
 
 function Buff( id, name, enchantments, descId ) {
 	Ench_Object.call(this, id, name, enchantments);
-	this.category = "Buffs";
+//	this.category = "Buffs";
 	this.descId = descId;
 	
 	if(typeof(this.descId) !== "string") {
@@ -230,7 +229,7 @@ Buff.prototype.scrapeData = function( finishedFlags, new_buff_flags ) {
 
 function Outfit( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
-	this.category = "Outfit";
+//	this.category = "Outfit";
 	
 	// Add self to Ench_Objects to enable tracking of this object
 	Ench_Objects.addObject(this);
@@ -279,7 +278,7 @@ Outfit.prototype.scrapeData = function( finishedFlags, new_outfit_flags ) {
 
 function Sign( id, name, enchantments ) {
 	Ench_Object.call(this, id, name, enchantments);
-	this.category = "Sign";
+//	this.category = "Sign";
 
 	
 	// Add self to Ench_Objects to enable tracking of this object
@@ -293,11 +292,11 @@ Sign.prototype.constructor = Sign;
 
 // Enchanted objects global storage object.
 Ench_Objects = {
-	equipment: {},
-	skill: {},
-	buff: {},
-	outfit: null,
-	sign: null,
+	Equipment: {},
+	Skill: {},
+	Buff: {},
+	Outfit: null,
+	Sign: null,
 	addObject : function( ench_obj ) {
 		// Argument Type Error Checking
 		if( ! this instanceof Ench_Object) {
@@ -305,18 +304,22 @@ Ench_Objects = {
 		}
 
 		// Add object to proper list/category in Ench_Objects
-		var ench_obj_type = ench_obj.constructor.name.toLowerCase();
+//		var ench_obj_type = ench_obj.constructor.name.toLowerCase();
+		var ench_obj_type = ench_obj.constructor.name;
 		if( this[ench_obj_type] === null || this[ench_obj_type] instanceof Ench_Object ) {
-			this[ench_obj.constructor.name.toLowerCase()] = ench_obj;
+			this[ench_obj_type] = ench_obj;
 		}
 		else {
-			this[ench_obj.constructor.name.toLowerCase()][ench_obj.id] = ench_obj;
+			this[ench_obj_type][ench_obj.id] = ench_obj;
 		}
 	},
 	removeObject : function( type, id ) {
 		// Argument Type Error Checking
-		if( typeof(type) === "undefined" || ( type !== "equipment" && type !== "skill" && type !== "buff" && type !== "outfit" && type !== "sign" ) ) {
-			throw new TypeError("Ench_Objects::removeObject() => type must be one of the following strings: \"equipment\", \"skills\", \"buffs\", \"outfit\", or \"sign\"");
+		if( typeof(type) === "undefined" || ( type !== "Equipment" && type !== "Skill" && type !== "Buff" && type !== "Outfit" && type !== "Sign" ) ) {
+			if( typeof(type) === "undefined" ) {
+				type = "undefined";
+			}
+			throw new TypeError("Ench_Objects::removeObject() => type must be one of the following strings: \"Equipment\", \"Skills\", \"Buffs\", \"Outfit\", or \"Sign\". type == " + type);
 		}
 		
 		if( typeof(id) !== "undefined" ) {

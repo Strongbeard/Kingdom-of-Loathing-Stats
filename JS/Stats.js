@@ -9,11 +9,11 @@ function Stat( name, percent, range ) {
 	this.minValue = 0;
 	this.maxValue = 0;
 	this.ench_list = {
-		equipment: {},
-		skills: {},
-		buffs: {},
-		outfit: null,
-		sign: null
+		Equipment: {},
+		Skill: {},
+		Buff: {},
+		Outfit: null,
+		Sign: null
 	};
 	
 	if( typeof(this.name) !== "string" ) {
@@ -68,7 +68,7 @@ Stat.prototype.addEnchantment = function( enchantment ) {
 	
 	// Add enchantment to the appropriate associative array using it's
 	// ench_obj id as a key
-	var category = enchantment.ench_obj.category.toLowerCase();
+	var category = enchantment.ench_obj.constructor.name;
 	if( this.ench_list[category] instanceof Ench_Object || this.ench_list[category] === null ) {
 		this.ench_list[category] = enchantment;
 	}
@@ -114,17 +114,18 @@ Stat.prototype.removeEnchantment = function( enchantment ) {
 		}
 	}
 	
-	// FIX FOR STAT HAVING AN "s" ON THE END OF "buff" and "skill"
-	var ench_object_type = enchantment.ench_obj.constructor.name.toLowerCase();
-	ench_object_type = (ench_object_type === "buff" || ench_object_type === "skill") ? ench_object_type + "s" : ench_object_type;
+	// TO DO: FIX FOR STAT HAVING AN "s" ON THE END OF "buff" and "skill"
+//	var ench_object_type = enchantment.ench_obj.constructor.name.toLowerCase();
+	var ench_object_type = enchantment.ench_obj.constructor.name;
+//	ench_object_type = (ench_object_type === "buff" || ench_object_type === "skill") ? ench_object_type + "s" : ench_object_type;
 	switch(ench_object_type) {
-		case "outfit":
-		case "sign":
+		case "Outfit":
+		case "Sign":
 			this.ench_list[ench_object_type] = null;
 			break;
-		case "equipment":
-		case "buffs":
-		case "skills":
+		case "Equipment":
+		case "Buff":
+		case "Skill":
 			delete this.ench_list[ench_object_type][enchantment.ench_obj.id];
 			break;
 	}
