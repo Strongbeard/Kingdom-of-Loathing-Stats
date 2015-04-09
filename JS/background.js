@@ -40,8 +40,8 @@ chrome.tabs.onUpdated.addListener( function(tabId, changeInfo, tab) {
 		// Flags represent completion of each Ench_Object set task
 		var finishedFlags = {
 			"Equipment" : false,
-			"Skills" : false,
-			"Buffs" : false,
+			"Skill" : false,
+			"Buff" : false,
 			"Outfit" : false,
 			"Sign" : false
 		}
@@ -74,16 +74,16 @@ function APICharacterSheet(finishedFlags) {
 		console.log(new_equipment_ids);
 		console.log(Ench_Objects);
 		// Remove old Equipment from Ench_Objects
-		$.each( Ench_Objects.equipment, function( id, equip ) {
+		$.each( Ench_Objects.Equipment, function( id, equip ) {
 			console.log(id);
 			if( new_equipment_ids[id] === undefined ) {
-				Ench_Objects.removeObject( "equipment", id );
+				Ench_Objects.removeObject( "Equipment", id );
 			}
 		});
 		
 		// Remove equipment already in Ench_Objects from lookup queue
 		$.each( new_equipment_ids, function ( id ) {
-			if( Ench_Objects.equipment[id] !== undefined ) {
+			if( Ench_Objects.Equipment[id] !== undefined ) {
 				delete new_equipment_ids[id];
 			}
 		});
@@ -111,10 +111,10 @@ function APICharacterSheet(finishedFlags) {
 		
 //		console.log("DELETE BUFFS");
 		// Remove old buffs from Ench_Objects
-		$.each( Ench_Objects.buff, function( id, buff ) {
+		$.each( Ench_Objects.Buff, function( id, buff ) {
 			if( charsheet_json.effects[buff.descId] === undefined ) {
 //				console.log( buff );
-				Ench_Objects.removeObject( "buff", id );
+				Ench_Objects.removeObject( "Buff", id );
 			}
 		});
 
@@ -122,7 +122,7 @@ function APICharacterSheet(finishedFlags) {
 		// Build queue of new buffs
 		new_buff_flags = {};
 		$.each( charsheet_json.effects, function( id, buff_array ) {
-			if( Ench_Objects.buff[parseInt(buff_array[4],10)] === undefined  ) {
+			if( Ench_Objects.Buff[parseInt(buff_array[4],10)] === undefined  ) {
 				new_buff_flags[id] = false;
 			}
 		});
@@ -139,7 +139,7 @@ function APICharacterSheet(finishedFlags) {
 		}
 		else {
 			// If no new equipment, check finished flag...
-			finishedFlags.Buffs = true;
+			finishedFlags.Buff = true;
 			// ...and attempt to run final function.
 			afterCharacterSheets(finishedFlags);
 		}
@@ -168,7 +168,7 @@ function HTMLCharacterSheet(finishedFlags) {
 		// ##### SKILLS #####
 
 		// Set finished flags and try to run post ajax script
-		finishedFlags.Skills = true;
+		finishedFlags.Skill = true;
 		
 		// ##### OUTFIT #####
 		
@@ -181,16 +181,16 @@ function HTMLCharacterSheet(finishedFlags) {
 			var outfit_id = parseInt(outfit_link_str.substr(0,outfit_link_str.indexOf("\"")),10);
 			
 			// If player was already wearing an outfit, remove it
-			if( Ench_Objects.outfit === null || Ench_Objects.outfit.id !== outfit_id ) {
-				Ench_Objects.removeObject( "outfit" );
+			if( Ench_Objects.Outfit === null || Ench_Objects.Outfit.id !== outfit_id ) {
+				Ench_Objects.removeObject( "Outfit" );
 				var outfit = new Outfit(outfit_id);
 				outfit.scrapeData(finishedFlags);
 			}
 		} // No outfit found. If player was wearing an outfit before, remove it
-		else if(Ench_Objects.outfit !== null) {
+		else if(Ench_Objects.Outfit !== null) {
 			// ###WORK HERE###???
 			// Remove Outfit
-			Ench_Objects.removeObject( "outfit" );	
+			Ench_Objects.removeObject( "Outfit" );	
 		}
 		// Done with outfits. Set flag to true & call final function
 		finishedFlags.Outfit = true;
