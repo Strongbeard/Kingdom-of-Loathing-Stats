@@ -276,8 +276,33 @@ Outfit.prototype.scrapeData = function( finishedFlags, new_outfit_flags ) {
 
 // --- CONSTRUCTORS ---
 
-function Sign( id, name, enchantments ) {
-	Ench_Object.call(this, id, name, enchantments);
+function Sign( id ) {
+	var enchantmentArray = new Array();
+	switch( id ) {
+		case "The Mongoose":
+			enchantmentArray.push(new Enchantment(Stats.musGain,10,true,false,10,this));
+			break;
+		case "The Wallaby":
+			break;
+		case "The Vole":
+			break;
+		case "The Platypus":
+			break;
+		case "The Opossum":
+			break;
+		case "The Marmot":
+			break;
+		case "The Wombat":
+			break;
+		case "The Blender":
+			break;
+		case "The Packrat":
+			break;
+		case "":
+		default:
+			break;
+	}
+	Ench_Object.call(this, id, id, []);
 //	this.category = "Sign";
 
 	
